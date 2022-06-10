@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SA2LevelEditor", "SA2LevelEditor\SA2LevelEditor.vcxproj", "{A6F69EA1-ED67-48F7-8E23-CFAFC6297DE2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SA2LevelViewer", "SA2LevelViewer\SA2LevelViewer.vcxproj", "{A6F69EA1-ED67-48F7-8E23-CFAFC6297DE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
