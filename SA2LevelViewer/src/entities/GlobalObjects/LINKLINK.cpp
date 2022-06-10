@@ -178,16 +178,16 @@ void LINKLINK::loadStaticModels()
     std::fprintf(stdout, "Loading LINKLINK static models...\n");
     #endif
 
-    loadModel(&LINKLINK::modelsCube, "res/Models/GlobalObjects/LinkLink/", "Cube");
-    loadModel(&LINKLINK::modelsSphere, "res/Models/GlobalObjects/LinkLink/", "Sphere");
+    loadModel(&LINKLINK::modelsCube, Global::dirProgRoot + "res/Models/GlobalObjects/LinkLink/", "Cube");
+    loadModel(&LINKLINK::modelsSphere, Global::dirProgRoot + "res/Models/GlobalObjects/LinkLink/", "Sphere");
 
     if (LINKLINK::cmBaseSphere == nullptr)
     {
-        LINKLINK::cmBaseSphere = loadCollisionModel("res/Models/GlobalObjects/LinkLink/", "Sphere");
+        LINKLINK::cmBaseSphere = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/LinkLink/", "Sphere");
     }
     if (LINKLINK::cmBaseCube == nullptr)
     {
-        LINKLINK::cmBaseCube = loadCollisionModel("res/Models/GlobalObjects/LinkLink/", "Cube");
+        LINKLINK::cmBaseCube = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/LinkLink/", "Cube");
     }
 }
 
@@ -206,7 +206,6 @@ void LINKLINK::deleteStaticModels()
 void LINKLINK::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -260,7 +259,6 @@ void LINKLINK::updateValue(int btnIndex)
         {
             float newX = std::stof(text);
             position.x = newX;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -272,7 +270,6 @@ void LINKLINK::updateValue(int btnIndex)
         {
             float newY = std::stof(text);
             position.y = newY;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -284,7 +281,6 @@ void LINKLINK::updateValue(int btnIndex)
         {
             float newZ = std::stof(text);
             position.z = newZ;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -296,7 +292,6 @@ void LINKLINK::updateValue(int btnIndex)
         {
             short newTimer = (short)std::stoi(text);
             timer = newTimer;
-            SetWindowTextA(Global::windowValues[5], std::to_string(timer).c_str());
             break;
         }
         catch (...) { break; }
@@ -309,7 +304,6 @@ void LINKLINK::updateValue(int btnIndex)
             short newRotY = Hex::stohshort(text);
             rotY = newRotY;
             rotationY = rotY & 0xFFFFFF00;
-            SetWindowTextA(Global::windowValues[6], Hex::to_string_short(rotY).c_str());
             break;
         }
         catch (...) { break; }
@@ -345,7 +339,6 @@ void LINKLINK::updateValue(int btnIndex)
 
             rotZ = newRotZ;
             rotationZ = rotZ & 0xFFFFFF00;
-            SetWindowTextA(Global::windowValues[7], Hex::to_string_short(rotZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -361,7 +354,6 @@ void LINKLINK::updateValue(int btnIndex)
                 MessageBox(NULL, "Warning: The total size of the cube is too large, object may not function properly in SA2.", "Warning", MB_OK);
             }
             var1 = fmaxf(0.0f, newScaleX);
-            SetWindowTextA(Global::windowValues[8], std::to_string(var1).c_str());
             break;
         }
         catch (...) { break; }
@@ -377,7 +369,6 @@ void LINKLINK::updateValue(int btnIndex)
                 MessageBox(NULL, "Warning: The total size of the cube is too large, object may not function properly in SA2.", "Warning", MB_OK);
             }
             var2 = fmaxf(0.0f, newScaleY);
-            SetWindowTextA(Global::windowValues[9], std::to_string(var2).c_str());
             break;
         }
         catch (...) { break; }
@@ -393,7 +384,6 @@ void LINKLINK::updateValue(int btnIndex)
                 MessageBox(NULL, "Warning: The total size of the cube is too large, object may not function properly in SA2.", "Warning", MB_OK);
             }
             var3 = fmaxf(0.0f, newScaleZ);
-            SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
             break;
         }
         catch (...) { break; }
@@ -424,53 +414,9 @@ void LINKLINK::updateValue(int btnIndex)
 
 void LINKLINK::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Timer");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Scale X");
-    SetWindowTextA(Global::windowLabels[ 9], "Scale Y");
-    SetWindowTextA(Global::windowLabels[10], "Scale Z");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "LINKLINK");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(timer).c_str());
-    SetWindowTextA(Global::windowValues[ 6], Hex::to_string_short(rotY & 0xFFFF).c_str());
-    SetWindowTextA(Global::windowValues[ 7], Hex::to_string_short(rotZ & 0xFFFF).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(scaleX).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(scaleY).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(scaleZ).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Point bonus trigger");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "How many frames you have until the combo runs out.");
-    SetWindowTextA(Global::windowDescriptions[ 6], "Left byte = y rotation (used for cube collision?). Right byte: 4 most significant bits -> counter. 4 least significant bits -> points");
-    SetWindowTextA(Global::windowDescriptions[ 7], "Left byte = y rotation (used for cube collision?). Right byte: least significant bit -> is sphere or is cube (1 for sphere)");
-    SetWindowTextA(Global::windowDescriptions[ 8], "If a cube, x scale. If a sphere, radius of the sphere.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "If a cube, y scale.");
-    SetWindowTextA(Global::windowDescriptions[10], "If a cube, z scale.");
 
     updateTransformationMatrixZY();
     updateCollisionModelZY();

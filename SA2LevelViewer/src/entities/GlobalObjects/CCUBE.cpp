@@ -155,11 +155,11 @@ void CCUBE::loadStaticModels()
     std::fprintf(stdout, "Loading CCUBE static models...\n");
     #endif
 
-    loadModel(&CCUBE::models, "res/Models/GlobalObjects/Collision/", "Cube");
+    loadModel(&CCUBE::models, Global::dirProgRoot + "res/Models/GlobalObjects/Collision/", "Cube");
 
     if (CCUBE::cmBase == nullptr)
     {
-        CCUBE::cmBase = loadCollisionModel("res/Models/GlobalObjects/Collision/", "Cube");
+        CCUBE::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Collision/", "Cube");
     }
 }
 
@@ -176,7 +176,6 @@ void CCUBE::deleteStaticModels()
 void CCUBE::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -232,7 +231,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -247,7 +245,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -262,7 +259,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -277,7 +273,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -296,7 +291,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(scaleX).c_str());
             break;
         }
         catch (...) { break; }
@@ -315,7 +309,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(scaleY).c_str());
             break;
         }
         catch (...) { break; }
@@ -334,7 +327,6 @@ void CCUBE::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(scaleZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -346,53 +338,9 @@ void CCUBE::updateValue(int btnIndex)
 
 void CCUBE::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Scale X");
-    SetWindowTextA(Global::windowLabels[ 9], "Scale Y");
-    SetWindowTextA(Global::windowLabels[10], "Scale Z");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "CCUBE");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(rotX).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(rotZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(scaleX).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(scaleY).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(scaleZ).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Invisible Collision Cube");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "Has no effect");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "Has no effect");
-    SetWindowTextA(Global::windowDescriptions[ 8], "");
-    SetWindowTextA(Global::windowDescriptions[ 9], "");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();

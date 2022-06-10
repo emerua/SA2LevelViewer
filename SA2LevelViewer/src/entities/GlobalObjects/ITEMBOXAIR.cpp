@@ -204,28 +204,28 @@ void ITEMBOXAIR::loadStaticModels()
     std::fprintf(stdout, "Loading ITEMBOXAIR static models...\n");
     #endif
 
-    loadModel(&ITEMBOXAIR::modelsBase,  "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirBase");
-    loadModel(&ITEMBOXAIR::modelsShell, "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirShell");
+    loadModel(&ITEMBOXAIR::modelsBase,  Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirBase");
+    loadModel(&ITEMBOXAIR::modelsShell, Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirShell");
 
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemSpeedUp");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemRing5");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "Item1Up");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemRing10");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemRing20");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemBarrierG");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemBomb");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemHealth");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemBarrierB");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemNothing");
-    ITEMBOXAIR::loadNewItemModel("res/Models/GlobalObjects/ItemBox/Items/", "ItemInvincible");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemSpeedUp");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemRing5");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "Item1Up");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemRing10");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemRing20");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemBarrierG");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemBomb");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemHealth");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemBarrierB");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemNothing");
+    ITEMBOXAIR::loadNewItemModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/Items/", "ItemInvincible");
 
     if (ITEMBOXAIR::cmBaseBase == nullptr)
     {
-        ITEMBOXAIR::cmBaseBase = loadCollisionModel("res/Models/GlobalObjects/ItemBox/", "ItemBoxAirBase");
+        ITEMBOXAIR::cmBaseBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirBase");
     }
     if (ITEMBOXAIR::cmBaseShell == nullptr)
     {
-        ITEMBOXAIR::cmBaseShell = loadCollisionModel("res/Models/GlobalObjects/ItemBox/", "ItemBoxAirShell");
+        ITEMBOXAIR::cmBaseShell = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/ItemBox/", "ItemBoxAirShell");
     }
 }
 
@@ -256,7 +256,6 @@ void ITEMBOXAIR::deleteStaticModels()
 void ITEMBOXAIR::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -310,7 +309,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newX = std::stof(text);
             position.x = newX;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -322,7 +320,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newY = std::stof(text);
             position.y = newY;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -334,7 +331,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newZ = std::stof(text);
             position.z = newZ;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -346,7 +342,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             short newRotX = Hex::stohshort(text);
             rotationX = (int)newRotX;
-            SetWindowTextA(Global::windowValues[5], Hex::to_string_short((short)rotationX).c_str());
             break;
         }
         catch (...) { break; }
@@ -358,7 +353,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             short newRotY = Hex::stohshort(text);
             rotationY = (int)newRotY;
-            SetWindowTextA(Global::windowValues[6], Hex::to_string_short((short)rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -370,7 +364,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             short newRotZ = Hex::stohshort(text);
             rotationZ = (int)newRotZ;
-            SetWindowTextA(Global::windowValues[7], Hex::to_string_short((short)rotationZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -382,7 +375,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newVar1 = std::stof(text);
             itemType = (int)newVar1;
-            SetWindowTextA(Global::windowValues[8], std::to_string(itemType).c_str());
             break;
         }
         catch (...) { break; }
@@ -394,7 +386,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newVar2 = std::stof(text);
             var2 = newVar2;
-            SetWindowTextA(Global::windowValues[9], std::to_string(var2).c_str());
             break;
         }
         catch (...) { break; }
@@ -406,7 +397,6 @@ void ITEMBOXAIR::updateValue(int btnIndex)
         {
             float newVar3 = std::stof(text);
             var3 = newVar3;
-            SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
             break;
         }
         catch (...) { break; }
@@ -435,53 +425,9 @@ void ITEMBOXAIR::updateValue(int btnIndex)
 
 void ITEMBOXAIR::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Item Type");
-    SetWindowTextA(Global::windowLabels[ 9], "Item Rot Speed?");
-    SetWindowTextA(Global::windowLabels[10], "Unknown");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "ITEMBOXAIR");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], Hex::to_string_short((short)rotationX).c_str());
-    SetWindowTextA(Global::windowValues[ 6], Hex::to_string_short((short)rotationY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], Hex::to_string_short((short)rotationZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(itemType).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(var2).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Anchored item box");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "0: speed shoes, 1: 5 rings, 2: extra life, 3: 10 rings, 4: 20 rings, 5: shield, 6: bomb, 7: health, 8: electric shield, 9: nothing, 10+: invincibility");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Y Rotation of the icon inside of the item box?");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     shell->setPosition(&position);
     shell->setRotation(rotationX, rotationY, rotationZ);

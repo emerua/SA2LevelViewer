@@ -21,7 +21,8 @@ Cursor3D::Cursor3D()
     visible = false;
     if (Cursor3D::textureCursor3D == nullptr)
     {
-        textureCursor3D = new GuiTexture(Loader::loadTextureNoInterpolation("res/Images/Cursor3D.png"), -1, -1, 1, 1, 0); INCR_NEW("GuiTexture")
+        std::string cursor3DimgPath = Global::dirProgRoot + "res/Images/Cursor3D.png";
+        textureCursor3D = new GuiTexture(Loader::loadTextureNoInterpolation(cursor3DimgPath.c_str()), -1, -1, 1, 1, 0); INCR_NEW("GuiTexture")
         textureCursor3D->setVisible(true);
         GuiManager::addGuiToRender(Cursor3D::textureCursor3D);
     }

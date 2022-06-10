@@ -128,11 +128,11 @@ void CCYL::loadStaticModels()
     std::fprintf(stdout, "Loading CCYL static models...\n");
     #endif
 
-    loadModel(&CCYL::models, "res/Models/GlobalObjects/Collision/", "Cylinder");
+    loadModel(&CCYL::models, Global::dirProgRoot + "res/Models/GlobalObjects/Collision/", "Cylinder");
 
     if (CCYL::cmBase == nullptr)
     {
-        CCYL::cmBase = loadCollisionModel("res/Models/GlobalObjects/Collision/", "Cylinder");
+        CCYL::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Collision/", "Cylinder");
     }
 }
 
@@ -149,7 +149,6 @@ void CCYL::deleteStaticModels()
 void CCYL::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -205,7 +204,6 @@ void CCYL::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -220,7 +218,6 @@ void CCYL::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -235,7 +232,6 @@ void CCYL::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -256,7 +252,6 @@ void CCYL::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(radius).c_str());
             break;
         }
         catch (...) { break; }
@@ -276,7 +271,6 @@ void CCYL::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(height).c_str());
             break;
         }
         catch (...) { break; }
@@ -288,53 +282,9 @@ void CCYL::updateValue(int btnIndex)
 
 void CCYL::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "");
-    SetWindowTextA(Global::windowLabels[ 6], "");
-    SetWindowTextA(Global::windowLabels[ 7], "");
-    SetWindowTextA(Global::windowLabels[ 8], "Radius");
-    SetWindowTextA(Global::windowLabels[ 9], "Height");
-    SetWindowTextA(Global::windowLabels[10], "");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "CCYL");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], "");
-    SetWindowTextA(Global::windowValues[ 6], "");
-    SetWindowTextA(Global::windowValues[ 7], "");
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(radius).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(height).c_str());
-    SetWindowTextA(Global::windowValues[10], "");
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 1, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Invisible Collision Cylinder. Can be stood on. Rubbing against the side will put Sonic in the \"push\" animation.");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "Radius of cylinder");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Height of cylinder (from center)");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();

@@ -209,21 +209,21 @@ void LIGHT_SW::loadStaticModels()
     std::fprintf(stdout, "Loading LIGHT_SW static models...\n");
     #endif
 
-    loadModel(&LIGHT_SW::modelsCube,     "res/Models/GlobalObjects/LightVolumes/", "LightBox");
-    loadModel(&LIGHT_SW::modelsSphere,   "res/Models/GlobalObjects/LightVolumes/", "LightSphere");
-    loadModel(&LIGHT_SW::modelsCylinder, "res/Models/GlobalObjects/LightVolumes/", "LightCylinder");
+    loadModel(&LIGHT_SW::modelsCube,     Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightBox");
+    loadModel(&LIGHT_SW::modelsSphere,   Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightSphere");
+    loadModel(&LIGHT_SW::modelsCylinder, Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightCylinder");
 
     if (LIGHT_SW::cmBaseCube == nullptr)
     {
-        LIGHT_SW::cmBaseCube = loadCollisionModel("res/Models/GlobalObjects/LightVolumes/", "LightBox");
+        LIGHT_SW::cmBaseCube = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightBox");
     }
     if (LIGHT_SW::cmBaseSphere == nullptr)
     {
-        LIGHT_SW::cmBaseSphere = loadCollisionModel("res/Models/GlobalObjects/LightVolumes/", "LightSphere");
+        LIGHT_SW::cmBaseSphere = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightSphere");
     }
     if (LIGHT_SW::cmBaseCylinder == nullptr)
     {
-        LIGHT_SW::cmBaseCylinder = loadCollisionModel("res/Models/GlobalObjects/LightVolumes/", "LightCylinder");
+        LIGHT_SW::cmBaseCylinder = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/LightVolumes/", "LightCylinder");
     }
 }
 
@@ -244,7 +244,6 @@ void LIGHT_SW::deleteStaticModels()
 void LIGHT_SW::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -299,7 +298,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newX = std::stof(text);
             position.x = newX;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -311,7 +309,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newY = std::stof(text);
             position.y = newY;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -323,7 +320,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newZ = std::stof(text);
             position.z = newZ;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -335,7 +331,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             int newRotX = Hex::stoh(text);
             rotationX = newRotX;
-            SetWindowTextA(Global::windowValues[5], Hex::to_string(rotationX).c_str());
             break;
         }
         catch (...) { break; }
@@ -347,7 +342,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             int newRotY = Hex::stoh(text);
             rotationY = newRotY;
-            SetWindowTextA(Global::windowValues[6], Hex::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -391,7 +385,6 @@ void LIGHT_SW::updateValue(int btnIndex)
             }
 
             rotationZ = newRotZ;
-            SetWindowTextA(Global::windowValues[7], Hex::to_string(rotationZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -403,7 +396,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newVar1 = std::stof(text);
             var1 = newVar1;
-            SetWindowTextA(Global::windowValues[8], std::to_string(var1).c_str());
             break;
         }
         catch (...) { break; }
@@ -415,7 +407,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newVar2 = std::stof(text);
             var2 = newVar2;
-            SetWindowTextA(Global::windowValues[9], std::to_string(var2).c_str());
             break;
         }
         catch (...) { break; }
@@ -427,7 +418,6 @@ void LIGHT_SW::updateValue(int btnIndex)
         {
             float newVar3 = std::stof(text);
             var3 = newVar3;
-            SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
             break;
         }
         catch (...) { break; }
@@ -446,53 +436,9 @@ void LIGHT_SW::updateValue(int btnIndex)
 
 void LIGHT_SW::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Scale X");
-    SetWindowTextA(Global::windowLabels[ 9], "Scale Y");
-    SetWindowTextA(Global::windowLabels[10], "Scale Z");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "LIGHT SW");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], Hex::to_string(rotationX).c_str());
-    SetWindowTextA(Global::windowValues[ 6], Hex::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], Hex::to_string(rotationZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(var1).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(var2).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Shadow volume. When player is inside, they are rendered with a different light color.");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "");
-    SetWindowTextA(Global::windowDescriptions[ 9], "");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     updateMyCollisionModel();
     box->setPosition(&position);

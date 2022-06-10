@@ -26,7 +26,9 @@ void GuiRenderer::init()
     positions.push_back(1);
     positions.push_back(-1);
     GuiRenderer::quadModel = Loader::loadToVAO(&positions, 2);
-    GuiRenderer::shader = new GuiShader("res/Shaders/guis/guiVertexShader.txt", "res/Shaders/guis/guiFragmentShader.txt"); INCR_NEW("GuiShader");
+    std::string guiVertexShader = Global::dirProgRoot + "res/Shaders/guis/guiVertexShader.txt";
+    std::string guiFragmentShader = Global::dirProgRoot + "res/Shaders/guis/guiFragmentShader.txt";
+    GuiRenderer::shader = new GuiShader(guiVertexShader.c_str(), guiFragmentShader.c_str()); INCR_NEW("GuiShader");
 }
 
 void GuiRenderer::render(std::list<GuiTexture*>* guis)

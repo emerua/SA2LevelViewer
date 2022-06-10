@@ -34,7 +34,7 @@ CameraTrigger::CameraTrigger(int type,
     scaleY = ys;
     scaleZ = zs;
 
-    visible = Global::displayCameraTriggers;
+    visible = Global::menuManager->displayCameraTriggers;
     if (triggerType == 1)
     {
         scaleY = xs;
@@ -72,7 +72,7 @@ CameraTrigger::CameraTrigger(int type,
 
 void CameraTrigger::step()
 {
-    visible = Global::displayCameraTriggers;
+    visible = Global::menuManager->displayCameraTriggers;
     collideModelTransformed->isVisible = visible;
 
     if (collideModelTransformed->wasCollidedWith)
@@ -111,7 +111,7 @@ void CameraTrigger::loadStaticModels()
         std::fprintf(stdout, "Loading CameraTrigger cube static models...\n");
         #endif
 
-        loadModel(&CameraTrigger::modelsCube, "res/Models/GlobalObjects/Trigger/", "TriggerCube");
+        loadModel(&CameraTrigger::modelsCube, Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerCube");
     }
 
     if (CameraTrigger::modelsSphere.size() == 0)
@@ -120,16 +120,16 @@ void CameraTrigger::loadStaticModels()
         std::fprintf(stdout, "Loading CameraTrigger sphere static models...\n");
         #endif
 
-        loadModel(&CameraTrigger::modelsSphere, "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
+        loadModel(&CameraTrigger::modelsSphere, Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
     }
 
     if (CameraTrigger::cmBaseCube == nullptr)
     {
-        CameraTrigger::cmBaseCube = loadCollisionModel("res/Models/GlobalObjects/Trigger/", "TriggerCube");
+        CameraTrigger::cmBaseCube = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerCube");
     }
 
     if (CameraTrigger::cmBaseSphere == nullptr)
     {
-        CameraTrigger::cmBaseSphere = loadCollisionModel("res/Models/GlobalObjects/Trigger/", "TriggerSphere");
+        CameraTrigger::cmBaseSphere = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
     }
 }

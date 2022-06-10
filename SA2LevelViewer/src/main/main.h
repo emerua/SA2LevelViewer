@@ -18,6 +18,7 @@ class Dummy;
 #include <unordered_map>
 #include <list>
 #include "../toolbox/level.h"
+#include "MenuManager.h"
 
 #define STATE_RUNNING 1
 #define STATE_EXITING 2
@@ -53,27 +54,14 @@ public:
     static std::list<Entity*> gameTransparentEntitiesToAdd;
     static std::list<Entity*> gameTransparentEntitiesToDelete;
 
+    static void attachSA2Process();
+    static char getMenuMode();
+    static char getCurrentLevel();
     static void updateCamFromSA2();
 
     static void teleportSA2PlayerToCursor3D();
 
     static int main();
-
-    static int initWin32GUI(HINSTANCE hInstance);
-
-    //when there is no object selected, call this to
-    // reset the values to blank and make them not editable.
-    static void resetObjectWindow();
-
-    static HWND mainWindow;
-    static HMENU mainMenu;
-    static HMENU mainMenuFile;
-    static HMENU mainMenuView;
-    static HMENU mainMenuSA2;
-    static std::vector<HWND> windowLabels;
-    static std::vector<HWND> windowValues;
-    static std::vector<HWND> windowButtons;
-    static std::vector<HWND> windowDescriptions;
 
     static bool redrawWindow;
 
@@ -98,18 +86,12 @@ public:
     static int countNew;
     static int countDelete;
     static int gameState;
-    static bool displayCameraTriggers;
-    static bool displayLoopspeedTriggers;
-    static bool displayStage;
-    static bool displayStageCollision;
-    static bool displayStageKillplanes;
-    static bool displayStageSky;
-    static bool renderWithCulling;
+
+    static MenuManager* menuManager;
 
     //if this is true, the editor will try to attach to a running SA2 process
     // and follow the camera
-    static bool gameIsFollowingSA2;
-    static bool gameIsFollowingSA2NoCam;
+    static bool isLoadedLevel;
     static int sa2Type;
     enum SA2Type
     {

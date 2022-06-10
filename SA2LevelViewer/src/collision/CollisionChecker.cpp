@@ -157,11 +157,6 @@ bool CollisionChecker::checkCollision(
         }
     }
 
-    if (Global::selectedSA2Object == nullptr)
-    {
-        Global::resetObjectWindow();
-    }
-
     //CollisionChecker::checkPlayer = false;
 
     return triangleCollide;

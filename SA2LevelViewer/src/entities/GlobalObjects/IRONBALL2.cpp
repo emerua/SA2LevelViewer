@@ -170,21 +170,21 @@ void IRONBALL2::loadStaticModels()
     std::fprintf(stdout, "Loading IRONBALL2 static models...\n");
     #endif
 
-    loadModel(&IRONBALL2::baseModels, "res/Models/GlobalObjects/IronBall2/", "Base");
-    loadModel(&IRONBALL2::rodModels,  "res/Models/GlobalObjects/IronBall2/", "Rod");
-    loadModel(&IRONBALL2::ballModels, "res/Models/GlobalObjects/IronBall2/", "Ball");
+    loadModel(&IRONBALL2::baseModels, Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Base");
+    loadModel(&IRONBALL2::rodModels,  Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Rod");
+    loadModel(&IRONBALL2::ballModels, Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Ball");
 
     if (IRONBALL2::cmBase == nullptr)
     {
-        IRONBALL2::cmBase = loadCollisionModel("res/Models/GlobalObjects/IronBall2/", "Base");
+        IRONBALL2::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Base");
     }
     if (IRONBALL2::cmRod == nullptr)
     {
-        IRONBALL2::cmRod = loadCollisionModel("res/Models/GlobalObjects/IronBall2/", "Rod");
+        IRONBALL2::cmRod = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Rod");
     }
     if (IRONBALL2::cmBall == nullptr)
     {
-        IRONBALL2::cmBall = loadCollisionModel("res/Models/GlobalObjects/IronBall2/", "Ball");
+        IRONBALL2::cmBall = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/IronBall2/", "Ball");
     }
 }
 
@@ -318,7 +318,6 @@ void IRONBALL2::despawnGuides() {
 void IRONBALL2::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -374,7 +373,6 @@ void IRONBALL2::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -389,7 +387,6 @@ void IRONBALL2::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -404,7 +401,6 @@ void IRONBALL2::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -418,7 +414,6 @@ void IRONBALL2::updateValue(int btnIndex)
             rotZ = newRotZ;
             oscillates = (int)rotZ / 2 % 2;
             updateTransformationMatrixYXZ();
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -431,7 +426,6 @@ void IRONBALL2::updateValue(int btnIndex)
             float newRadius = std::stof(text);
             radius = newRadius;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(radius).c_str());
             break;
         }
         catch (...) { break; }
@@ -443,7 +437,6 @@ void IRONBALL2::updateValue(int btnIndex)
         {
             float newSpeed = std::stof(text);
             rotSpeed = newSpeed;
-            SetWindowTextA(Global::windowValues[9], std::to_string(rotSpeed).c_str());
             break;
         }
         catch (...) { break; }
@@ -458,7 +451,6 @@ void IRONBALL2::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(rotSpeed).c_str());
             break;
         }
         catch (...) { break; }
@@ -474,53 +466,9 @@ void IRONBALL2::updateValue(int btnIndex)
 
 void IRONBALL2::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "");
-    SetWindowTextA(Global::windowLabels[ 6], "");
-    SetWindowTextA(Global::windowLabels[ 7], "Oscillates?");
-    SetWindowTextA(Global::windowLabels[ 8], "Rod Radius");
-    SetWindowTextA(Global::windowLabels[ 9], "Turn Speed");
-    SetWindowTextA(Global::windowLabels[10], "Oscillation");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "IRONBALL2");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], "");
-    SetWindowTextA(Global::windowValues[ 6], "");
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(rotZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(radius).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(rotSpeed).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(oscillation).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 1, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Spinning Spike Balls");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "If value / 2 is odd, the object will oscillate.\nCurrent value: " + oscillates);
-    SetWindowTextA(Global::windowDescriptions[ 8], "Radius of rod holding the spikes. Value is additive, meaning that -1 causes the spike balls to converge into a single ball.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Value is additive, meaning that -1 counters the default value and makes it not move. Default rotation is clockwise.");
-    SetWindowTextA(Global::windowDescriptions[10], "Oscillation amount, in game units.");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();

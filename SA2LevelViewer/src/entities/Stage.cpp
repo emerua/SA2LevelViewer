@@ -32,7 +32,7 @@ Stage::Stage()
 
 void Stage::step()
 {
-    visible = Global::displayStage;
+    visible = Global::menuManager->displayStage;
     if (Stage::collisionModel != nullptr)
     {
         Stage::collisionModel->isVisible = visible;

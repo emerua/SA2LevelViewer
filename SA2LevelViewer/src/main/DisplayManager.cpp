@@ -90,9 +90,12 @@ int DisplayManager::createDisplay()
     glfwSetKeyCallback(glfwWindow, DisplayManager::callbackKeyboard);
 
     GLFWimage icons[3];
-    icons[0].pixels = SOIL_load_image("res/Images/Icon16.png", &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
-    icons[1].pixels = SOIL_load_image("res/Images/Icon32.png", &icons[1].width, &icons[1].height, 0, SOIL_LOAD_RGBA);
-    icons[2].pixels = SOIL_load_image("res/Images/Icon64.png", &icons[2].width, &icons[2].height, 0, SOIL_LOAD_RGBA);
+    std::string icon16 = Global::dirProgRoot + "res/Images/Icon16.png";
+    std::string icon32 = Global::dirProgRoot + "res/Images/Icon32.png";
+    std::string icon64 = Global::dirProgRoot + "res/Images/Icon64.png";
+    icons[0].pixels = SOIL_load_image(icon16.c_str(), &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
+    icons[1].pixels = SOIL_load_image(icon32.c_str(), &icons[1].width, &icons[1].height, 0, SOIL_LOAD_RGBA);
+    icons[2].pixels = SOIL_load_image(icon64.c_str(), &icons[2].width, &icons[2].height, 0, SOIL_LOAD_RGBA);
 
     if (icons[0].pixels != nullptr &&
         icons[1].pixels != nullptr &&
@@ -491,7 +494,6 @@ void DisplayManager::callbackKeyboard(GLFWwindow* /*window*/, int key, int /*sca
                     Global::selectedSA2Object->cleanUp();
                     Global::selectedSA2Object = nullptr;
                     Global::redrawWindow = true;
-                    Global::resetObjectWindow();
                 }
             }
             break;

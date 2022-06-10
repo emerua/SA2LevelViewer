@@ -150,11 +150,11 @@ void E_KUMI::loadStaticModels()
     std::fprintf(stdout, "Loading E_KUMI static models...\n");
     #endif
 
-    loadModel(&E_KUMI::models, "res/Models/GlobalObjects/Beetle/", "Beetle");
+    loadModel(&E_KUMI::models, Global::dirProgRoot + "res/Models/GlobalObjects/Beetle/", "Beetle");
 
     if (E_KUMI::cmBase == nullptr)
     {
-        E_KUMI::cmBase = loadCollisionModel("res/Models/GlobalObjects/Beetle/", "Beetle");
+        E_KUMI::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Beetle/", "Beetle");
     }
 }
 
@@ -171,7 +171,6 @@ void E_KUMI::deleteStaticModels()
 void E_KUMI::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -227,7 +226,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -242,7 +240,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -257,7 +254,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -272,7 +268,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(Maths::bamsToDeg(rotationX)).c_str());
             break;
         }
         catch (...) { break; }
@@ -287,7 +282,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(Maths::bamsToDeg(rotationY)).c_str());
             break;
         }
         catch (...) { break; }
@@ -302,7 +296,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(Maths::bamsToDeg(rotationZ)).c_str());
             break;
         }
         catch (...) { break; }
@@ -316,7 +309,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(var1).c_str());
             break;
         }
         catch (...) { break; }
@@ -330,7 +322,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(var2).c_str());
             break;
         }
         catch (...) { break; }
@@ -344,7 +335,6 @@ void E_KUMI::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
             break;
         }
         catch (...) { break; }
@@ -356,53 +346,9 @@ void E_KUMI::updateValue(int btnIndex)
 
 void E_KUMI::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Unknown");
-    SetWindowTextA(Global::windowLabels[ 9], "Unknown");
-    SetWindowTextA(Global::windowLabels[10], "Unknown");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "E_KUMI");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(Maths::bamsToDeg(rotationX)).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(Maths::bamsToDeg(rotationY)).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(Maths::bamsToDeg(rotationZ)).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(var1).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(var2).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 1, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Beetle enemy");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "");
-    SetWindowTextA(Global::windowDescriptions[ 9], "");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();

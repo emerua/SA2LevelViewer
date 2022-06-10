@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 #include <string>
 #include <cstring>
@@ -81,6 +82,10 @@
 #include "../entities/GlobalObjects/3spring.h"
 #include "../entities/GlobalObjects/ekumi.h"
 #include "../entities/GlobalObjects/eai.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_glfw.h"
+#include "../imgui/imgui_impl_opengl3.h"
+#include "MenuManager.h"
 
 std::string Global::version = "0.0.7";
 
@@ -132,34 +137,18 @@ int Global::countNew = 0;
 int Global::countDelete = 0;
 int Global::gameState = 0;
 int Global::levelID = 0;
-bool Global::shouldLoadNewLevel = false;
-bool Global::shouldExportLevel  = false;
-bool Global::gameIsFollowingSA2 = false;
-bool Global::gameIsFollowingSA2NoCam = false;
-bool Global::displayCameraTriggers = false;
-bool Global::displayLoopspeedTriggers = false;
-bool Global::displayStage = true;
-bool Global::displayStageCollision = false;
-bool Global::displayStageKillplanes = false;
-bool Global::displayStageSky = false;
-bool Global::renderWithCulling = false;
 int Global::sa2Type = Global::SA2Type::None;
+bool Global::shouldLoadNewLevel = false;
+bool Global::shouldExportLevel = false;
+bool Global::isLoadedLevel = false;
+
+MenuManager* Global::menuManager = nullptr;
 
 int Global::gameMissionNumber = 0;
 std::unordered_map<std::string, std::string> Global::levelSetToLVL2;
 
-HWND  Global::mainWindow   = nullptr;
-HMENU Global::mainMenu     = nullptr;
-HMENU Global::mainMenuFile = nullptr;
-HMENU Global::mainMenuView = nullptr;
-HMENU Global::mainMenuSA2  = nullptr;
-std::vector<HWND> Global::windowLabels;
-std::vector<HWND> Global::windowValues;
-std::vector<HWND> Global::windowButtons;
-std::vector<HWND> Global::windowDescriptions;
 
-void addMenus(HWND window);
-void addControls(HWND window);
+bool isFollowRealTime = false;
 
 //entry point of the program
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int /*nCmdShow*/)
@@ -172,399 +161,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpC
     freopen("CONOUT$", "w",stderr);
     #endif
 
-    if (Global::initWin32GUI(hInstance) < 0)
-    {
-        MessageBox(NULL, "RegisterClassW failed. Not sure why. Program can't start without that though, so I have to quit.", "Fatal Error", MB_OK);
-        return -1;
-    }
+    char tmp[MAX_PATH] = { 0 };
+    char progRoot[MAX_PATH] = { 0 };
+
+    GetModuleFileName(NULL, tmp, MAX_PATH);
+    GetLongPathName(tmp, progRoot, sizeof(progRoot));
+    std::filesystem::path progRootPath(progRoot);
+    Global::dirProgRoot = progRootPath.remove_filename().string();
+
+    std::filesystem::path sa2RootPath(Global::dirSA2Root + "\\resource\\gd_PC\\");
+    std::filesystem::current_path(sa2RootPath);
 
     return Global::main();
 }
 
-#define CMD_FILE_LOAD               1
-#define CMD_FILE_EXPORT             2
-#define CMD_FILE_EXIT               3
-#define CMD_VIEW_STAGE              4
-#define CMD_VIEW_COLLISION          5
-#define CMD_VIEW_KILLPLANES         6
-#define CMD_VIEW_BACKGROUND         7
-#define CMD_VIEW_CAMERA_TRIGGER     8
-#define CMD_VIEW_LOOPSPEED_TRIGGER  9
-#define CMD_VIEW_CULLING           10
-#define CMD_SA2_FOLLOW             11
-#define CMD_SA2_FOLLOW_NO_CAM      12
-#define CMD_SA2_TELEPORT           13
-#define CMD_HELP                   14
-
-#define CMD_BTN_1  20
-#define CMD_BTN_2  21
-#define CMD_BTN_3  22
-#define CMD_BTN_4  23
-#define CMD_BTN_5  24
-#define CMD_BTN_6  25
-#define CMD_BTN_7  26
-#define CMD_BTN_8  27
-#define CMD_BTN_9  28
-#define CMD_BTN_10 29
-#define CMD_BTN_11 30
-
-void addMenus(HWND window)
-{
-    Global::mainMenu     = CreateMenu();
-    Global::mainMenuFile = CreateMenu();
-    Global::mainMenuView = CreateMenu();
-    Global::mainMenuSA2  = CreateMenu();
-
-    AppendMenu(Global::mainMenuFile, MF_STRING, CMD_FILE_LOAD, "Load Objects from SET Files");
-    AppendMenu(Global::mainMenuFile, MF_STRING, CMD_FILE_EXPORT, "Export Objects to SET Files");
-    AppendMenu(Global::mainMenuFile, MF_SEPARATOR, 0, "");
-    AppendMenu(Global::mainMenuFile, MF_STRING, CMD_FILE_EXIT, "Exit");
-
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_STAGE            , "View Stage");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_COLLISION        , "View Collision");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_KILLPLANES       , "View Killplanes");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_BACKGROUND       , "View Background");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_CAMERA_TRIGGER   , "View Camera Triggers");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_LOOPSPEED_TRIGGER, "View Loopspeed Triggers");
-    AppendMenu(Global::mainMenuView, MF_STRING, CMD_VIEW_CULLING          , "Backface Culling");
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_STAGE            , MF_CHECKED); 
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_COLLISION        , MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_KILLPLANES       , MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_BACKGROUND       , MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_CAMERA_TRIGGER   , MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_LOOPSPEED_TRIGGER, MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuView, CMD_VIEW_CULLING          , MF_UNCHECKED);
-
-    AppendMenu(Global::mainMenuSA2, MF_STRING, CMD_SA2_FOLLOW,        "Follow SA2 in Real Time");
-    AppendMenu(Global::mainMenuSA2, MF_STRING, CMD_SA2_FOLLOW_NO_CAM, "Follow SA2 in Real Time (No Camera)");
-    AppendMenu(Global::mainMenuSA2, MF_STRING, CMD_SA2_TELEPORT,      "Teleport Playable Character to 3D Cursor");
-    CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW,        MF_UNCHECKED);
-    CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW_NO_CAM, MF_UNCHECKED);
-
-    AppendMenu(Global::mainMenu, MF_POPUP, (UINT_PTR)Global::mainMenuFile, "File");
-    AppendMenu(Global::mainMenu, MF_POPUP, (UINT_PTR)Global::mainMenuView, "View");
-    AppendMenu(Global::mainMenu, MF_POPUP, (UINT_PTR)Global::mainMenuSA2, "SA2");
-    AppendMenu(Global::mainMenu, MF_STRING, CMD_HELP, "Help");
-
-    SetMenu(window, Global::mainMenu);
-}
-
-void addControls(HWND window)
-{
-    //CreateWindowW(L"static", L"Enter text here:", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 200, 100, 100, 50, window, NULL, NULL, NULL);
-    //CreateWindowW(L"Edit", L"...", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL, 200, 152, 100, 50, window, NULL, NULL, NULL);
-    int entryHOffset = 60;
-    int pad = 2;
-
-    int entryHeight = 20;
-    int entryWidth = 80;
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"ID"        , WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  0*entryHOffset+( 1*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Name"      , WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  1*entryHOffset+( 2*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Position X", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  2*entryHOffset+( 3*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Position Y", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  3*entryHOffset+( 4*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Position Z", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  4*entryHOffset+( 5*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Rotation X", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  5*entryHOffset+( 6*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Rotation Y", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  6*entryHOffset+( 7*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Rotation Z", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  7*entryHOffset+( 8*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Variable 1", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  8*entryHOffset+( 9*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Variable 2", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad,  9*entryHOffset+(10*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-    Global::windowLabels.push_back(CreateWindowW(L"STATIC", L"Variable 3", WS_VISIBLE | WS_CHILD | WS_BORDER, 0+pad, 10*entryHOffset+(11*pad), entryWidth, entryHeight, window, NULL, NULL, NULL));
-
-    int entry2Height = 20;
-    int entry2Width = 156;
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  0*entryHOffset+( 1*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  1*entryHOffset+( 2*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  2*entryHOffset+( 3*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  3*entryHOffset+( 4*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  4*entryHOffset+( 5*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  5*entryHOffset+( 6*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  6*entryHOffset+( 7*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  7*entryHOffset+( 8*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  8*entryHOffset+( 9*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad,  9*entryHOffset+(10*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-    Global::windowValues.push_back(CreateWindowW(L"EDIT",   L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+2*pad, 10*entryHOffset+(11*pad), entry2Width, entry2Height, window, NULL, NULL, NULL));
-
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  0*entryHOffset+( 2*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_1,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update",              WS_CHILD, entryWidth+2*pad,  1*entryHOffset+( 3*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_2,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  2*entryHOffset+( 4*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_3,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  3*entryHOffset+( 5*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_4,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  4*entryHOffset+( 6*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_5,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  5*entryHOffset+( 7*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_6,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  6*entryHOffset+( 8*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_7,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  7*entryHOffset+( 9*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_8,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  8*entryHOffset+(10*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_9,  NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad,  9*entryHOffset+(11*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_10, NULL, NULL));
-    Global::windowButtons.push_back(CreateWindowW(L"BUTTON", L"Update", WS_VISIBLE | WS_CHILD, entryWidth+2*pad, 10*entryHOffset+(12*pad)+entry2Height, entry2Width, entry2Height, window, (HMENU)CMD_BTN_11, NULL, NULL));
-
-    int entry3Height = 60;
-    int entry3Width = 320;
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  0*entryHOffset+( 1*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  1*entryHOffset+( 2*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  2*entryHOffset+( 3*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  3*entryHOffset+( 4*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  4*entryHOffset+( 5*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  5*entryHOffset+( 6*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  6*entryHOffset+( 7*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  7*entryHOffset+( 8*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  8*entryHOffset+( 9*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad,  9*entryHOffset+(10*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-    Global::windowDescriptions.push_back(CreateWindowW(L"STATIC", L"", WS_VISIBLE | WS_CHILD | WS_BORDER, entryWidth+entry2Width+3*pad, 10*entryHOffset+(11*pad), entry3Width, entry3Height, window, NULL, NULL, NULL));
-}
-
-LRESULT CALLBACK win32WindowCallback(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-    switch (msg)
-    {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-
-    case WM_COMMAND:
-        switch (wp)
-        {
-        case CMD_FILE_LOAD:   Global::shouldLoadNewLevel = true; break;
-        case CMD_FILE_EXPORT: Global::shouldExportLevel  = true; break;
-        case CMD_FILE_EXIT:   Global::gameState = STATE_EXITING; break;
-
-        case CMD_VIEW_STAGE:
-        {
-            Global::displayStage = !Global::displayStage;
-            if (Global::displayStage) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_STAGE, MF_CHECKED  ); }
-            else                      { CheckMenuItem(Global::mainMenuView, CMD_VIEW_STAGE, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_COLLISION:
-        {
-            Global::displayStageCollision = !Global::displayStageCollision;
-            if (Global::displayStageCollision) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_COLLISION, MF_CHECKED  ); }
-            else                               { CheckMenuItem(Global::mainMenuView, CMD_VIEW_COLLISION, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_KILLPLANES:
-        {
-            Global::displayStageKillplanes = !Global::displayStageKillplanes;
-            if (Global::displayStageKillplanes) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_KILLPLANES, MF_CHECKED  ); }
-            else                                { CheckMenuItem(Global::mainMenuView, CMD_VIEW_KILLPLANES, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_BACKGROUND:
-        {
-            Global::displayStageSky = !Global::displayStageSky;
-            if (Global::displayStageSky) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_BACKGROUND, MF_CHECKED  ); }
-            else                         { CheckMenuItem(Global::mainMenuView, CMD_VIEW_BACKGROUND, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_CAMERA_TRIGGER:
-        {
-            Global::displayCameraTriggers = !Global::displayCameraTriggers;
-            if (Global::displayCameraTriggers) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_CAMERA_TRIGGER, MF_CHECKED  ); }
-            else                               { CheckMenuItem(Global::mainMenuView, CMD_VIEW_CAMERA_TRIGGER, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_LOOPSPEED_TRIGGER:
-        {
-            Global::displayLoopspeedTriggers = !Global::displayLoopspeedTriggers;
-            if (Global::displayLoopspeedTriggers) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_LOOPSPEED_TRIGGER, MF_CHECKED  ); }
-            else                                  { CheckMenuItem(Global::mainMenuView, CMD_VIEW_LOOPSPEED_TRIGGER, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-        case CMD_VIEW_CULLING:
-        {
-            Global::renderWithCulling = !Global::renderWithCulling;
-            if (Global::renderWithCulling) { CheckMenuItem(Global::mainMenuView, CMD_VIEW_CULLING, MF_CHECKED  ); }
-            else                           { CheckMenuItem(Global::mainMenuView, CMD_VIEW_CULLING, MF_UNCHECKED); }
-            Global::redrawWindow = true;
-            break;
-        }
-
-        case CMD_SA2_FOLLOW:
-        {
-            Global::gameIsFollowingSA2 = !Global::gameIsFollowingSA2;
-            if (Global::gameIsFollowingSA2NoCam)
-            {
-                Global::gameIsFollowingSA2NoCam = false;
-            }
-            if (Global::gameIsFollowingSA2) { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW, MF_CHECKED  ); }
-            else                            { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW, MF_UNCHECKED); }
-            if (Global::gameIsFollowingSA2NoCam) { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW_NO_CAM, MF_CHECKED  ); }
-            else                                 { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW_NO_CAM, MF_UNCHECKED); }
-            break;
-        }
-        case CMD_SA2_FOLLOW_NO_CAM:
-        {
-            Global::gameIsFollowingSA2NoCam = !Global::gameIsFollowingSA2NoCam;
-            if (Global::gameIsFollowingSA2)
-            {
-                Global::gameIsFollowingSA2 = false;
-            }
-            if (Global::gameIsFollowingSA2) { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW, MF_CHECKED  ); }
-            else                            { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW, MF_UNCHECKED); }
-            if (Global::gameIsFollowingSA2NoCam) { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW_NO_CAM, MF_CHECKED  ); }
-            else                                 { CheckMenuItem(Global::mainMenuSA2, CMD_SA2_FOLLOW_NO_CAM, MF_UNCHECKED); }
-            break;
-        }
-        case CMD_SA2_TELEPORT: Global::teleportSA2PlayerToCursor3D(); break;
-        
-        case CMD_HELP: MessageBox(NULL,
-                (("Version " + Global::version) + "\n\n"
-                "Load the U and S setfile in and the rest of the stage models will load automatically.\n" 
-                "Controls:\n"
-                "    Mouse scroll to move camera forward/backward\n"
-                "    Alt + Mouse scroll to move camera towards/away from the 3D Cursor\n"
-                "    Mouse middle click + mouse move to rotate camera\n"
-                "    Mouse middle click + mouse move + Shift to pan camera\n"
-                "    Mouse middle click + mouse move + Alt to rotate camera around 3D Cursor\n"
-                "    Mouse middle click + mouse move + Shift + Alt to pan camera relative to 3D Cursor\n").c_str()
-                , "Help", MB_OK); break;
-        
-        case CMD_BTN_1:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_1 -CMD_BTN_1); } break;
-        case CMD_BTN_2:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_2 -CMD_BTN_1); } break;
-        case CMD_BTN_3:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_3 -CMD_BTN_1); } break;
-        case CMD_BTN_4:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_4 -CMD_BTN_1); } break;
-        case CMD_BTN_5:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_5 -CMD_BTN_1); } break;
-        case CMD_BTN_6:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_6 -CMD_BTN_1); } break;
-        case CMD_BTN_7:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_7 -CMD_BTN_1); } break;
-        case CMD_BTN_8:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_8 -CMD_BTN_1); } break;
-        case CMD_BTN_9:  if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_9 -CMD_BTN_1); } break;
-        case CMD_BTN_10: if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_10-CMD_BTN_1); } break;
-        case CMD_BTN_11: if (Global::selectedSA2Object != nullptr) { Global::selectedSA2Object->updateValue(CMD_BTN_11-CMD_BTN_1); } break;
-
-        default: break;
-        }
-        break;
-
-    default:
-        return DefWindowProcW(hWnd, msg, wp, lp);
-    }
-
-    return 0;
-}
-
-int Global::initWin32GUI(HINSTANCE hInstance)
-{
-    WNDCLASSW wc = {0};
-
-    wc.hbrBackground = CreateSolidBrush(RGB(200, 200, 200));//(HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
-    wc.hInstance     = hInstance;
-    wc.lpszClassName = L"SA2 Level Editor";
-    wc.lpfnWndProc   = win32WindowCallback;
-
-    if (!RegisterClassW(&wc))
-    {
-        return -1;
-    }
-
-    Global::mainWindow = CreateWindowW(L"SA2 Level Editor", L"SA2 Level Editor", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 580, 743, NULL, NULL, NULL, NULL);
-
-    addMenus(Global::mainWindow);
-    addControls(Global::mainWindow);
-
-    Global::resetObjectWindow();
-
-    //TODO: have some sort of option that allows the user to relocate existing objects
-    // to the location of the 3d cursor. Then maybe a right click could select objects and not move the 3d cursor.
-
-    //MSG msg = {0};
-
-    //while (GetMessage(&msg, NULL, NULL, NULL))
-    //{
-    //    TranslateMessage(&msg);
-    //    DispatchMessage(&msg);
-    //}
-
-    return 0;
-}
-
-void Global::resetObjectWindow()
-{
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Variable 1");
-    SetWindowTextA(Global::windowLabels[ 9], "Variable 2");
-    SetWindowTextA(Global::windowLabels[10], "Variable 3");
-
-    SetWindowTextA(Global::windowValues[ 0], "");
-    SetWindowTextA(Global::windowValues[ 1], "");
-    SetWindowTextA(Global::windowValues[ 2], "");
-    SetWindowTextA(Global::windowValues[ 3], "");
-    SetWindowTextA(Global::windowValues[ 4], "");
-    SetWindowTextA(Global::windowValues[ 5], "");
-    SetWindowTextA(Global::windowValues[ 6], "");
-    SetWindowTextA(Global::windowValues[ 7], "");
-    SetWindowTextA(Global::windowValues[ 8], "");
-    SetWindowTextA(Global::windowValues[ 9], "");
-    SetWindowTextA(Global::windowValues[10], "");
-
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 1, 0);
-
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "");
-    SetWindowTextA(Global::windowDescriptions[ 9], "");
-    SetWindowTextA(Global::windowDescriptions[10], "");
-}
-
-//int main2(int argc, char** argv)
-//{
-    //used to get the root directory. but now since the program
-    // doesnt start here its kind of useless.
-    //if (argc >= 1)
-    //{
-    //    std::string pathog = argv[0];
-    //    const char* path = pathog.c_str();
-    //    int lastFolderIdx = 0;
-    //    for (int i = (int)pathog.length()-1; i >= 0; i--)
-    //    {
-    //        if (path[i] == '\\')
-    //        {
-    //            lastFolderIdx = i;
-    //            break;
-    //        }
-    //    }
-    //
-    //    std::string realPath = "";
-    //    for (int i = 0; i < lastFolderIdx; i++)
-    //    {
-    //        realPath = realPath + path[i];
-    //    }
-    //    Global::dirProgRoot = realPath;
-    //}
-
-    //return Global::main();
-//}
-
 int Global::main()
 {
-    MessageBox(NULL, (("Version " + Global::version) +"\nProgram is still a work in progress.").c_str(), "SA2 Level Editor", MB_OK);
+    MessageBox(NULL, (("Version " + Global::version) +"\nProgram is still a work in progress.").c_str(), "SA2 Level Viewer", MB_OK);
 
     Global::countNew = 0;
     Global::countDelete = 0;
@@ -614,7 +227,7 @@ int Global::main()
 
     //Load all global object models
     #ifndef OBS_MODE
-    loadModel(&playerModels, "res/Models/GlobalObjects/Sonic/", "Sonic");
+    loadModel(&playerModels, Global::dirProgRoot + "res/Models/GlobalObjects/Sonic/", "Sonic");
     RING::loadStaticModels();
     Unknown::loadStaticModels();
     SPRB::loadStaticModels();
@@ -650,6 +263,7 @@ int Global::main()
     Global::gamePlayer->visible = false;
     #endif
 
+    Global::menuManager = new MenuManager(DisplayManager::getWindow());
 
     glfwSetTime(0);
 
@@ -667,7 +281,7 @@ int Global::main()
 
         timeOld = timeNew;
 
-        if (!Global::gameIsFollowingSA2 && !Global::gameIsFollowingSA2NoCam)
+        if (!Global::menuManager->gameIsFollowingSA2 && !Global::menuManager->gameIsFollowingSA2NoCam)
         {
             Input::waitForInputs();
         }
@@ -696,11 +310,10 @@ int Global::main()
             #endif
         }
 
-        if (!Global::redrawWindow && !Global::gameIsFollowingSA2 && !Global::gameIsFollowingSA2NoCam)
+        if (Global::menuManager->autoLoadObjects)
         {
-            continue;
+            LevelLoader::autoLoadLevel();
         }
-        Global::redrawWindow = false;
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
@@ -709,7 +322,7 @@ int Global::main()
             std::fprintf(stderr, "%d\n", err);
         }
 
-        if (Global::gameIsFollowingSA2 || Global::gameIsFollowingSA2NoCam)
+        if (Global::menuManager->gameIsFollowingSA2 || Global::menuManager->gameIsFollowingSA2NoCam)
         {
             //Camera prevCam(Global::gameCamera);
             //Vector3f prevPos(&Global::gamePlayer->position);
@@ -877,7 +490,16 @@ int Global::main()
                 }
             }
         }
-        std::string title = "SA2 Level Editor.  Level ID: "+std::to_string(Global::levelID)+"  Object Count: "+std::to_string(totalSA2Objects);
+
+        Global::menuManager->InitRender();
+        Global::shouldLoadNewLevel = Global::menuManager->CreateViewWindow();
+        Global::menuManager->CreateHelpWindow(Global::version);
+        Global::menuManager->Render();
+
+        Global::menuManager->gameIsFollowingSA2 = Global::menuManager->isFollowRealTime && !Global::menuManager->gameIsFollowingSA2NoCam;
+        Global::menuManager->gameIsFollowingSA2NoCam = Global::menuManager->isFollowRealTime && Global::menuManager->gameIsFollowingSA2NoCam;
+
+        std::string title = "SA2 Level Viewer.  Level ID: "+std::to_string(Global::levelID)+"  Object Count: "+std::to_string(totalSA2Objects);
         glfwSetWindowTitle(DisplayManager::getWindow(), title.c_str());
 
         DisplayManager::updateDisplay();
@@ -895,6 +517,8 @@ int Global::main()
         //std::fprintf(stdout, "dt: %f\n", dt);
         //std::this_thread::sleep_for(std::chrono::milliseconds(8));
     }
+
+    delete Global::menuManager;
 
     MasterRenderer::cleanUp();
     Loader::cleanUp();
@@ -1110,63 +734,123 @@ DWORD getPIDByName(const char* processName)
     return NULL;
 }
 
-void Global::updateCamFromSA2()
+void Global::attachSA2Process()
 {
-    if (sa2Handle == NULL || sa2PID == NULL)
+    sa2PID = NULL;
+    sa2Handle = NULL;
+
+    if (timeUntilNextProcessAttach <= 0.0f)
     {
-        sa2PID = NULL;
-        sa2Handle = NULL;
+        Global::sa2Type = Global::SA2Type::None;
 
-        if (timeUntilNextProcessAttach <= 0.0f)
+        sa2PID = getPIDByName("sonic2app.exe");
+
+        if (sa2PID == NULL)
         {
-            Global::sa2Type = Global::SA2Type::None;
-
-            sa2PID = getPIDByName("sonic2app.exe");
+            sa2PID = getPIDByName("Dolphin.exe");
 
             if (sa2PID == NULL)
             {
-                sa2PID = getPIDByName("Dolphin.exe");
+                sa2PID = getPIDByName("sonic.exe");
 
                 if (sa2PID == NULL)
                 {
-                    sa2PID = getPIDByName("sonic.exe");
-
-                    if (sa2PID == NULL)
-                    {
-                        timeUntilNextProcessAttach = ATTACH_DELAY;
-                    }
-                    else
-                    {
-                        Global::sa2Type = Global::SA2Type::Sadx;
-                    }
+                    timeUntilNextProcessAttach = ATTACH_DELAY;
                 }
                 else
                 {
-                    Global::sa2Type = Global::SA2Type::Dolphin;
+                    Global::sa2Type = Global::SA2Type::Sadx;
                 }
             }
             else
             {
-                Global::sa2Type = Global::SA2Type::Steam;
-            }
-
-            if (sa2PID != NULL)
-            {
-                sa2Handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_OPERATION | PROCESS_VM_WRITE, false, sa2PID);
-                if (sa2Handle == NULL)
-                {
-                    std::fprintf(stdout, "Error: Found the process, but couldn't open and get a handle.\n");
-                    sa2PID = NULL;
-                    timeUntilNextProcessAttach = ATTACH_DELAY;
-                }
+                Global::sa2Type = Global::SA2Type::Dolphin;
             }
         }
         else
         {
-            extern float dt;
-            timeUntilNextProcessAttach -= dt;
+            Global::sa2Type = Global::SA2Type::Steam;
         }
 
+        if (sa2PID != NULL)
+        {
+            sa2Handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_OPERATION | PROCESS_VM_WRITE, false, sa2PID);
+            if (sa2Handle == NULL)
+            {
+                std::fprintf(stdout, "Error: Found the process, but couldn't open and get a handle.\n");
+                sa2PID = NULL;
+                timeUntilNextProcessAttach = ATTACH_DELAY;
+            }
+        }
+    }
+    else
+    {
+        extern float dt;
+        timeUntilNextProcessAttach -= dt;
+    }
+
+    return;
+}
+
+
+char Global::getMenuMode()
+{
+    char menuMode = 0;
+
+    if (sa2Handle == NULL || sa2PID == NULL)
+    {
+        Global::attachSA2Process();
+        return menuMode;
+    }
+
+    if (Global::sa2Type == Global::SA2Type::Steam)
+    {
+        SIZE_T bytesRead = 0;
+
+        if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x1934BE0, (LPVOID)(&menuMode), sizeof(menuMode), &bytesRead) || bytesRead != sizeof(menuMode))
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return menuMode;
+        }
+    }
+
+    return menuMode;
+}
+
+char Global::getCurrentLevel()
+{
+    char currentLevel = 0;
+
+    if (sa2Handle == NULL || sa2PID == NULL)
+    {
+        Global::attachSA2Process();
+        return currentLevel;
+    }
+
+    if (Global::sa2Type == Global::SA2Type::Steam)
+    {
+        SIZE_T bytesRead = 0;
+        if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x1934B70, (LPVOID)(&currentLevel), sizeof(currentLevel), &bytesRead) || bytesRead != sizeof(currentLevel))
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return currentLevel;
+        }
+    }
+
+    return currentLevel;
+}
+
+void Global::updateCamFromSA2()
+{
+    if (sa2Handle == NULL || sa2PID == NULL)
+    {
+        Global::attachSA2Process();
         return;
     }
 
@@ -1210,7 +894,7 @@ void Global::updateCamFromSA2()
         int yaw;
         memcpy(&yaw, &buffer[16], 4);
 
-        if (Global::gameIsFollowingSA2 && !Global::gameIsFollowingSA2NoCam)
+        if (Global::menuManager->gameIsFollowingSA2 && !Global::menuManager->gameIsFollowingSA2NoCam)
         {
             Global::gameCamera->eye.x = camX;
             Global::gameCamera->eye.y = camY;
@@ -1312,30 +996,6 @@ void Global::updateCamFromSA2()
         Global::gamePlayer->setPosition(sonicX, sonicY, sonicZ);
         Global::gamePlayer->setRotation(bamsX, -bamsY, bamsZ);
         Global::gamePlayer->updateTransformationMatrixYXZ();
-
-        //make the score have a 1 at the end as a first
-        // line of defence against cheaters :)
-        char score;
-        bytesRead = 0;
-        if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x0174B050, (LPVOID)(&score), (SIZE_T)1, &bytesRead) || bytesRead != 1)
-        {
-            CloseHandle(sa2Handle);
-            sa2Handle = NULL;
-            sa2PID = NULL;
-            timeUntilNextProcessAttach = ATTACH_DELAY;
-            return;
-        }
-
-        score = score | 0x1;
-        SIZE_T bytesWritten = 0;
-        if (!WriteProcessMemory(sa2Handle, (LPVOID)0x0174B050, (LPCVOID)(&score), (SIZE_T)1, &bytesWritten) || bytesWritten != 1)
-        {
-            CloseHandle(sa2Handle);
-            sa2Handle = NULL;
-            sa2PID = NULL;
-            timeUntilNextProcessAttach = ATTACH_DELAY;
-            return;
-        }
     }
     else if (Global::sa2Type == Global::SA2Type::Dolphin)
     {
@@ -1390,7 +1050,7 @@ void Global::updateCamFromSA2()
             memcpy(ptr+1, &buffer[18], 1);
             memcpy(ptr+0, &buffer[19], 1);
 
-            if (Global::gameIsFollowingSA2 && !Global::gameIsFollowingSA2NoCam)
+            if (Global::menuManager->gameIsFollowingSA2 && !Global::menuManager->gameIsFollowingSA2NoCam)
             {
                 Global::gameCamera->eye.x = camX;
                 Global::gameCamera->eye.y = camY;
@@ -1641,7 +1301,7 @@ void Global::updateCamFromSA2()
         Global::gamePlayer->setRotation(playerRotX, -playerRotY, playerRotZ);
         Global::gamePlayer->updateTransformationMatrixYXZ();
 
-        if (Global::gameIsFollowingSA2 && !Global::gameIsFollowingSA2NoCam)
+        if (Global::menuManager->gameIsFollowingSA2 && !Global::menuManager->gameIsFollowingSA2NoCam)
         {
             Global::gameCamera->eye.x = camPosX;
             Global::gameCamera->eye.y = camPosY;
@@ -1650,29 +1310,29 @@ void Global::updateCamFromSA2()
             Global::gameCamera->pitch = -Maths::bamsToDeg(camRotX);
         }
 
-        ////make the score have a 1 at the end as a first
-        //// line of defence against cheaters :)
-        //char score;
-        //bytesRead = 0;
-        //if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x0174B050, (LPVOID)(&score), (SIZE_T)1, &bytesRead) || bytesRead != 1)
-        //{
-        //    CloseHandle(sa2Handle);
-        //    sa2Handle = NULL;
-        //    sa2PID = NULL;
-        //    timeUntilNextProcessAttach = ATTACH_DELAY;
-        //    return;
-        //}
-        //
-        //score = score | 0x1;
-        //SIZE_T bytesWritten = 0;
-        //if (!WriteProcessMemory(sa2Handle, (LPVOID)0x0174B050, (LPCVOID)(&score), (SIZE_T)1, &bytesWritten) || bytesWritten != 1)
-        //{
-        //    CloseHandle(sa2Handle);
-        //    sa2Handle = NULL;
-        //    sa2PID = NULL;
-        //    timeUntilNextProcessAttach = ATTACH_DELAY;
-        //    return;
-        //}
+        //make the score have a 1 at the end as a first
+        // line of defence against cheaters :)
+        char score;
+        bytesRead = 0;
+        if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x0174B050, (LPVOID)(&score), (SIZE_T)1, &bytesRead) || bytesRead != 1)
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return;
+        }
+        
+        score = score | 0x1;
+        SIZE_T bytesWritten = 0;
+        if (!WriteProcessMemory(sa2Handle, (LPVOID)0x0174B050, (LPCVOID)(&score), (SIZE_T)1, &bytesWritten) || bytesWritten != 1)
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return;
+        }
     }
 }
 

@@ -171,10 +171,10 @@ void BIGJUMP::loadStaticModels()
     std::fprintf(stdout, "Loading BIGJUMP static models...\n");
     #endif
 
-    loadModel(&BIGJUMP::models, "res/Models/GlobalObjects/BigJump/", "BigJump");
+    loadModel(&BIGJUMP::models, Global::dirProgRoot + "res/Models/GlobalObjects/BigJump/", "BigJump");
     if (BIGJUMP::cmBase == nullptr)
     {
-        BIGJUMP::cmBase = loadCollisionModel("res/Models/GlobalObjects/BigJump/", "BigJump");
+        BIGJUMP::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/BigJump/", "BigJump");
     }
 }
 
@@ -191,7 +191,6 @@ void BIGJUMP::deleteStaticModels()
 void BIGJUMP::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -246,7 +245,6 @@ void BIGJUMP::updateValue(int btnIndex)
             float newX = std::stof(text);
             position.x = newX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -259,7 +257,6 @@ void BIGJUMP::updateValue(int btnIndex)
             float newY = std::stof(text);
             position.y = newY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -272,7 +269,6 @@ void BIGJUMP::updateValue(int btnIndex)
             float newZ = std::stof(text);
             position.z = newZ;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -285,7 +281,6 @@ void BIGJUMP::updateValue(int btnIndex)
             int newRotX = std::stoi(text);
             rotationX = newRotX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(rotationX).c_str());
             break;
         }
         catch (...) { break; }
@@ -298,7 +293,6 @@ void BIGJUMP::updateValue(int btnIndex)
             int newRotY = std::stoi(text);
             rotationY = newRotY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -311,7 +305,6 @@ void BIGJUMP::updateValue(int btnIndex)
             int newRotZ = std::stoi(text);
             rotationZ = newRotZ;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(rotationZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -324,7 +317,6 @@ void BIGJUMP::updateValue(int btnIndex)
             float newVar1 = std::stof(text);
             powerH = newVar1;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(powerH).c_str());
             break;
         }
         catch (...) { break; }
@@ -337,7 +329,6 @@ void BIGJUMP::updateValue(int btnIndex)
             int newVar2 = std::stoi(text);
             cooldown = newVar2;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(cooldown).c_str());
             break;
         }
         catch (...) { break; }
@@ -350,7 +341,6 @@ void BIGJUMP::updateValue(int btnIndex)
             float newVar3 = std::stof(text);
             powerV = newVar3;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(powerV).c_str());
             break;
         }
         catch (...) { break; }
@@ -372,58 +362,11 @@ void BIGJUMP::updateValue(int btnIndex)
 
 void BIGJUMP::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Power H");
-    SetWindowTextA(Global::windowLabels[ 9], "?");
-    SetWindowTextA(Global::windowLabels[10], "Power V");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "BIGJUMP");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(rotationX).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(rotationZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(powerH).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(cooldown).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(powerV).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Launch Panel");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "Affects model and collision, but not launch direction.");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "Affects model and collision, but not launch direction.");
     #ifndef SAB_GUIDES
-    SetWindowTextA(Global::windowDescriptions[ 8], "Horizontal speed of the player after being launched.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Unsure if this has any effect.");
-    SetWindowTextA(Global::windowDescriptions[10], "Vertical speed of the player after being launched.");
     #else
-    SetWindowTextA(Global::windowDescriptions[ 8], "Speed");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Time lock frames");
-    SetWindowTextA(Global::windowDescriptions[10], "");
     #endif
 
     #ifndef SAB_GUIDES

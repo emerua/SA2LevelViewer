@@ -200,7 +200,6 @@ void KDDRNGL::deleteStaticModels()
 void KDDRNGL::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     bool remakeRings = false;
@@ -256,7 +255,6 @@ void KDDRNGL::updateValue(int btnIndex)
             float newX = std::stof(text);
             position.x = newX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             remakeRings = true;
             break;
         }
@@ -270,7 +268,6 @@ void KDDRNGL::updateValue(int btnIndex)
             float newY = std::stof(text);
             position.y = newY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             remakeRings = true;
             break;
         }
@@ -284,7 +281,6 @@ void KDDRNGL::updateValue(int btnIndex)
             float newZ = std::stof(text);
             position.z = newZ;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             remakeRings = true;
             break;
         }
@@ -298,7 +294,6 @@ void KDDRNGL::updateValue(int btnIndex)
             int newRotX = std::stoi(text);
             rotationX = newRotX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(rotationX).c_str());
             remakeRings = true;
             break;
         }
@@ -312,7 +307,6 @@ void KDDRNGL::updateValue(int btnIndex)
             int newRotY = std::stoi(text);
             rotationY = newRotY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             remakeRings = true;
             break;
         }
@@ -326,7 +320,6 @@ void KDDRNGL::updateValue(int btnIndex)
             int newID = std::stoi(text);
             shrineID = newID;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(shrineID).c_str());
             break;
         }
         catch (...) { break; }
@@ -339,7 +332,6 @@ void KDDRNGL::updateValue(int btnIndex)
             float newRingDelta = std::stof(text);
             ringDelta = newRingDelta;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(ringDelta).c_str());
             remakeRings = true;
             break;
         }
@@ -353,7 +345,6 @@ void KDDRNGL::updateValue(int btnIndex)
             float newRingCount = std::stof(text);
             numRings = (int)newRingCount;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(numRings).c_str());
             remakeRings = true;
             break;
         }
@@ -372,53 +363,9 @@ void KDDRNGL::updateValue(int btnIndex)
 
 void KDDRNGL::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Shrine ID");
-    SetWindowTextA(Global::windowLabels[ 8], "Ring Delta");
-    SetWindowTextA(Global::windowLabels[ 9], "");
-    SetWindowTextA(Global::windowLabels[10], "Ring Count");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "KDDRNGL");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(rotationX).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(rotationZ).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(ringDelta).c_str());
-    SetWindowTextA(Global::windowValues[ 9], "");
-    SetWindowTextA(Global::windowValues[10], std::to_string(numRings).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Shrine-activated line of Rings");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "ID of shrine that activates rings.");
-    SetWindowTextA(Global::windowDescriptions[ 8], "Distance between each individual ring.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "");
-    SetWindowTextA(Global::windowDescriptions[10], "Total number of rings in the line.");
 
     despawnChildren();
     spawnChildren();

@@ -72,6 +72,7 @@
 #include <Windows.h>
 #include <commdlg.h>
 #include <tchar.h>
+#include <direct.h>
 
 int LevelLoader::numLevels = 0;
 std::vector<std::string> LevelLoader::lvlFile;
@@ -80,7 +81,7 @@ std::unordered_map<int, std::string> LevelLoader::objectIdToName;
 void LevelLoader::initObjectMap()
 {
     //go through all the files and load the values into the map
-    std::string folder = "res/StageObjectLists/";
+    std::string folder = Global::dirProgRoot + "res/StageObjectLists/";
 
     for (int lvlId = 0; lvlId <= 70; lvlId++)
     {
@@ -138,7 +139,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
         return;
     }
 
-    fname = "res/Levels/"+Global::levelSetToLVL2[setS];
+    fname = Global::dirProgRoot + "res/Levels/"+Global::levelSetToLVL2[setS];
     Global::dirSet = setDir;
 
     freeAllStaticModels();
@@ -161,7 +162,6 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
 
     Global::gameCamera->reset();
     Global::selectedSA2Object = nullptr;
-    Global::resetObjectWindow();
 
 
     std::ifstream file(fname);
@@ -193,6 +193,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     //visible model directory
     std::string modelDir;
     getlineSafe(file, modelDir);
+    modelDir = Global::dirProgRoot + modelDir;
     //visible model name
     std::string modelName;
     getlineSafe(file, modelName);
@@ -203,6 +204,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     //collision model directory
     std::string colDir;
     getlineSafe(file, colDir);
+    colDir = Global::dirProgRoot + colDir;
     //collision model name
     std::string colName;
     getlineSafe(file, colName);
@@ -213,6 +215,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     //killplane directory
     std::string killDir;
     getlineSafe(file, killDir);
+    killDir = Global::dirProgRoot + killDir;
     //killplane model name
     std::string killName;
     getlineSafe(file, killName);
@@ -222,6 +225,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     //sky directory
     std::string skyDir;
     getlineSafe(file, skyDir);
+    skyDir = Global::dirProgRoot + skyDir;
     //sky model name
     std::string skyName;
     getlineSafe(file, skyName);
@@ -280,7 +284,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     }
 
     //now go through the camera file
-    std::string camFilename = "res/Camera/stg" + std::to_string(Global::levelID) + "cam.txt";
+    std::string camFilename = Global::dirProgRoot + "res/Camera/stg" + std::to_string(Global::levelID) + "cam.txt";
     std::ifstream camFile(camFilename);
     if (!camFile.is_open())
     {
@@ -309,7 +313,7 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     }
 
     //now go through the loopspeed file
-    std::string loopFilename = "res/Loops/stg" + std::to_string(Global::levelID) + "loop.txt";
+    std::string loopFilename = Global::dirProgRoot + "res/Loops/stg" + std::to_string(Global::levelID) + "loop.txt";
     std::ifstream loopFile(loopFilename);
     if (!loopFile.is_open())
     {
@@ -340,11 +344,12 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     //Loader::printInfo();
 
     Global::gameState = STATE_RUNNING;
+    Global::isLoadedLevel = true;
 
-    glfwSetTime(0);
-    extern double timeOld;
+    //glfwSetTime(0);
+    //extern double timeOld;
     //extern double previousTime;
-    timeOld = 0.0;
+    //timeOld = 0.0;
     //previousTime = 0.0;
 }
 
@@ -370,7 +375,6 @@ void LevelLoader::loadLevelSAB(std::string fileLvl, std::string fileObj)
 
     Global::gameCamera->reset();
     Global::selectedSA2Object = nullptr;
-    Global::resetObjectWindow();
 
     LevelLoader::lvlFile.clear();
 
@@ -1065,23 +1069,25 @@ std::string LevelLoader::getObjectName(int levelID, int objectID)
 
 void LevelLoader::promptUserForLevel()
 {
-    #if defined(_WIN32)
-    int response = MessageBox(NULL, 
-                              "Load a new level? Unsaved progress will be lost!", 
-                              "Load New Level", 
-                              MB_YESNO);
+#if defined(_WIN32)
+    int response = MessageBox(NULL,
+        "Load a new level? Unsaved progress will be lost!",
+        "Load New Level",
+        MB_YESNO);
     if (response != IDYES)
     {
         return;
     }
 
     const int BUFSIZE = 1024;
-    char filePaths[BUFSIZE] = {0};
-    OPENFILENAME ofns = {0};
+    char filePaths[BUFSIZE] = { 0 };
+    OPENFILENAME ofns = { 0 };
     ofns.lStructSize = sizeof(OPENFILENAME);
     ofns.lpstrFile = filePaths;
     ofns.nMaxFile = BUFSIZE;
-    ofns.lpstrInitialDir = (Global::dirSA2Root + "\\resource\\gd_PC\\").c_str();
+
+    std::string initDir = Global::dirSA2Root + "\\resource\\gd_PC\\";
+    ofns.lpstrInitialDir = initDir.c_str();
     ofns.lpstrFilter = "SET files (set*_*.bin)\0set*_*.bin\0";
     ofns.nFilterIndex = 1; //default filter to show
     ofns.lpstrTitle = "Select BOTH setXXXX_s AND setXXXX_u for the level you want to edit";
@@ -1101,14 +1107,14 @@ void LevelLoader::promptUserForLevel()
     {
         if (filePaths[i] == 0)
         {
-            if (filePaths[i+1] == 0)
+            if (filePaths[i + 1] == 0)
             {
                 MessageBox(NULL, "You only selected one file. Please select both setXXXX_s.bin and setXXXX_u.bin", "silly", MB_OK);
                 return;
             }
             else
             {
-                file2 = &filePaths[i+1];
+                file2 = &filePaths[i + 1];
                 break;
             }
         }
@@ -1116,12 +1122,12 @@ void LevelLoader::promptUserForLevel()
 
     if (Global::levelSetToLVL2.find(file1) == Global::levelSetToLVL2.end())
     {
-        MessageBox(NULL, (("This program does not recognize "+file1)+" to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
+        MessageBox(NULL, (("This program does not recognize " + file1) + " to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
         return;
     }
     if (Global::levelSetToLVL2.find(file2) == Global::levelSetToLVL2.end())
     {
-        MessageBox(NULL, (("This program does not recognize "+file2)+" to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
+        MessageBox(NULL, (("This program does not recognize " + file2) + " to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
         return;
     }
 
@@ -1187,9 +1193,79 @@ void LevelLoader::promptUserForLevel()
     //}
 
     //std::fprintf(stdout, "dir = '%s'   s = '%s'   u = '%s'\n", (folder+"\\").c_str(), file1.c_str(), file2.c_str());
-    LevelLoader::loadLevel((folder+"\\"), file1, file2);
+    LevelLoader::loadLevel((folder + "\\"), file1, file2);
     Global::redrawWindow = true;
-    #endif
+#endif
+}
+
+void LevelLoader::autoLoadLevel()
+{
+    if (Global::getMenuMode() == 0)
+    {
+        Global::isLoadedLevel = false;
+        return;
+    }
+
+    if (Global::isLoadedLevel)
+    {
+        return;
+    }
+
+    char currentLevel = Global::getCurrentLevel();
+
+    std::string folder = Global::dirSA2Root + "\\resource\\gd_PC\\";
+
+    char prefix[8];
+    std::snprintf(prefix, std::size(prefix), "set%04d", currentLevel);
+
+    std::string prefixStr = prefix;
+    std::string file1 = prefixStr;
+    file1 += "_s.bin";
+    std::string file2 = prefixStr;
+    file2 += "_u.bin";
+
+    if (Global::levelSetToLVL2.find(file1) == Global::levelSetToLVL2.end())
+    {
+        std::transform(file1.cbegin(), file1.cend(), file1.begin(), toupper);
+        if (Global::levelSetToLVL2.find(file1) == Global::levelSetToLVL2.end())
+        {
+            MessageBox(NULL, (("This program does not recognize " + file1) + " to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
+            Global::menuManager->autoLoadObjects = false;
+            return;
+        }
+    }
+    if (Global::levelSetToLVL2.find(file2) == Global::levelSetToLVL2.end())
+    {
+        std::transform(file2.cbegin(), file2.cend(), file2.begin(), toupper);
+        if (Global::levelSetToLVL2.find(file2) == Global::levelSetToLVL2.end())
+        {
+            MessageBox(NULL, (("This program does not recognize " + file2) + " to have a SA2 level associated with it.").c_str(), "silly", MB_OK);
+            Global::menuManager->autoLoadObjects = false;
+            return;
+        }
+    }
+
+    std::string lvl1 = Global::levelSetToLVL2[file1];
+    std::string lvl2 = Global::levelSetToLVL2[file2];
+
+    if (lvl1 != lvl2)
+    {
+        MessageBox(NULL, "These setfiles aren't associated with the same SA2 level.", "silly", MB_OK);
+        Global::menuManager->autoLoadObjects = false;
+        return;
+    }
+
+    if (lvl1 == "" ||
+        lvl2 == "")
+    {
+        MessageBox(NULL, "This level is not supported at this time.", "silly", MB_OK);
+        Global::menuManager->autoLoadObjects = false;
+        return;
+    }
+
+    LevelLoader::loadLevel((folder + "\\"), file1, file2);
+    Global::isLoadedLevel = true;
+    Global::redrawWindow = true;
 }
 
 void LevelLoader::promptUserForLevelSAB()
@@ -1256,7 +1332,8 @@ void LevelLoader::exportLevel()
     ofns.lStructSize = sizeof(OPENFILENAME);
     ofns.lpstrFile = filePaths;
     ofns.nMaxFile = BUFSIZE;
-    ofns.lpstrInitialDir = (Global::dirSA2Root + "\\resource\\gd_PC\\").c_str();
+    std::string initDir = Global::dirSA2Root + "\\resource\\gd_PC\\";
+    ofns.lpstrInitialDir = initDir.c_str();
     ofns.lpstrFilter = "SET files (set*_*.bin)\0set*_*.bin\0";
     ofns.nFilterIndex = 1; //default filter to show
     ofns.lpstrTitle = "Select BOTH setXXXX_s AND setXXXX_u for the level you want to export to.";

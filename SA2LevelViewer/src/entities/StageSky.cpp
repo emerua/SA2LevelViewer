@@ -31,7 +31,7 @@ StageSky::StageSky()
 
 void StageSky::step()
 {
-    visible = Global::displayStageSky;
+    visible = Global::menuManager->displayStageSky;
 
     position.set(&Global::gameCamera->eye);
 

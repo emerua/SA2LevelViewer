@@ -220,7 +220,6 @@ void RING_LINEAR::deleteStaticModels()
 void RING_LINEAR::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     bool remakeRings = false;
@@ -276,7 +275,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newX = std::stof(text);
             position.x = newX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             remakeRings = true;
             break;
         }
@@ -290,7 +288,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newY = std::stof(text);
             position.y = newY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             remakeRings = true;
             break;
         }
@@ -304,7 +301,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newZ = std::stof(text);
             position.z = newZ;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             remakeRings = true;
             break;
         }
@@ -318,7 +314,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newRotX = std::stof(text);
             rotationX = Maths::degToBams(newRotX);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(Maths::bamsToDeg((signed short)rotationX)).c_str());
             remakeRings = true;
             break;
         }
@@ -332,7 +327,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newRotY = std::stof(text);
             rotationY = Maths::degToBams(newRotY);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(Maths::bamsToDeg((signed short)rotationY)).c_str());
             remakeRings = true;
             break;
         }
@@ -346,7 +340,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newRotZ = std::stof(text);
             rotationZ = Maths::degToBams(newRotZ);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(Maths::bamsToDeg((signed short)rotationZ)).c_str());
             remakeRings = true;
             break;
         }
@@ -360,7 +353,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newRingDelta = std::stof(text);
             ringDelta = newRingDelta;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(ringDelta).c_str());
             remakeRings = true;
             break;
         }
@@ -374,7 +366,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newCurveHeight = std::stof(text);
             curveHeight = newCurveHeight;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(curveHeight).c_str());
             remakeRings = true;
             break;
         }
@@ -388,7 +379,6 @@ void RING_LINEAR::updateValue(int btnIndex)
             float newRingCount = std::stof(text);
             numRings = (int)newRingCount;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(numRings).c_str());
             remakeRings = true;
             break;
         }
@@ -407,53 +397,9 @@ void RING_LINEAR::updateValue(int btnIndex)
 
 void RING_LINEAR::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Ring Delta");
-    SetWindowTextA(Global::windowLabels[ 9], "Curve Height");
-    SetWindowTextA(Global::windowLabels[10], "Ring Count");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "RING_LINEAR");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(Maths::bamsToDeg((signed short)rotationX)).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(Maths::bamsToDeg((signed short)rotationY)).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(Maths::bamsToDeg((signed short)rotationZ)).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(ringDelta).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(curveHeight).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(numRings).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "");
-    SetWindowTextA(Global::windowDescriptions[ 6], "");
-    SetWindowTextA(Global::windowDescriptions[ 7], "");
-    SetWindowTextA(Global::windowDescriptions[ 8], "Distance between each individual ring.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Height of the curve that the rings follow.");
-    SetWindowTextA(Global::windowDescriptions[10], "Total number of rings in the line.");
 
     despawnChildren();
     spawnChildren();

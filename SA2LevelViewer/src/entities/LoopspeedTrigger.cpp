@@ -26,7 +26,7 @@ LoopspeedTrigger::LoopspeedTrigger(float x,  float y,  float z)
     scaleY = 40;
     scaleZ = 40;
 
-    visible = Global::displayLoopspeedTriggers;
+    visible = Global::menuManager->displayLoopspeedTriggers;
 
     collideModelOriginal = LoopspeedTrigger::cmBaseSphere;
 
@@ -41,7 +41,7 @@ LoopspeedTrigger::LoopspeedTrigger(float x,  float y,  float z)
 
 void LoopspeedTrigger::step()
 {
-    visible = Global::displayLoopspeedTriggers;
+    visible = Global::menuManager->displayLoopspeedTriggers;
     collideModelTransformed->isVisible = visible;
 
     if (collideModelTransformed->wasCollidedWith)
@@ -67,11 +67,11 @@ void LoopspeedTrigger::loadStaticModels()
         std::fprintf(stdout, "Loading LoopspeedTrigger sphere static models...\n");
         #endif
 
-        loadModel(&LoopspeedTrigger::modelsSphere, "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
+        loadModel(&LoopspeedTrigger::modelsSphere, Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
     }
 
     if (LoopspeedTrigger::cmBaseSphere == nullptr)
     {
-        LoopspeedTrigger::cmBaseSphere = loadCollisionModel("res/Models/GlobalObjects/Trigger/", "TriggerSphere");
+        LoopspeedTrigger::cmBaseSphere = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Trigger/", "TriggerSphere");
     }
 }

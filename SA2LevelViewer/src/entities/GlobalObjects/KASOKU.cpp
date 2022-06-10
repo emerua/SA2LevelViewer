@@ -156,16 +156,16 @@ void KASOKU::loadStaticModels()
     #endif
 
     #ifndef SAB_LVL
-    loadModel(&KASOKU::models, "res/Models/GlobalObjects/Dashpad/", "Dashpad");
+    loadModel(&KASOKU::models, Global::dirProgRoot + "res/Models/GlobalObjects/Dashpad/", "Dashpad");
     if (KASOKU::cmBase == nullptr)
     {
-        KASOKU::cmBase = loadCollisionModel("res/Models/GlobalObjects/Dashpad/", "Dashpad");
+        KASOKU::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Dashpad/", "Dashpad");
     }
     #else
-    loadModel(&KASOKU::models, "res/Models/GlobalObjects/Dashpad/", "DashpadSab");
+    loadModel(&KASOKU::models, Global::dirProgRoot + "res/Models/GlobalObjects/Dashpad/", "DashpadSab");
     if (KASOKU::cmBase == nullptr)
     {
-        KASOKU::cmBase = loadCollisionModel("res/Models/GlobalObjects/Dashpad/", "DashpadSab");
+        KASOKU::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Dashpad/", "DashpadSab");
     }
     #endif
 }
@@ -183,7 +183,6 @@ void KASOKU::deleteStaticModels()
 void KASOKU::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -237,7 +236,6 @@ void KASOKU::updateValue(int btnIndex)
             float newX = std::stof(text);
             position.x = newX;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -250,7 +248,6 @@ void KASOKU::updateValue(int btnIndex)
             float newY = std::stof(text);
             position.y = newY;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -263,7 +260,6 @@ void KASOKU::updateValue(int btnIndex)
             float newZ = std::stof(text);
             position.z = newZ;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -276,7 +272,6 @@ void KASOKU::updateValue(int btnIndex)
             float newRotX = std::stof(text);
             rotationX = Maths::degToBams(newRotX);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(Maths::bamsToDeg(rotationX)).c_str());
             break;
         }
         catch (...) { break; }
@@ -289,7 +284,6 @@ void KASOKU::updateValue(int btnIndex)
             float newRotY = std::stof(text);
             rotationY = Maths::degToBams(newRotY);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(Maths::bamsToDeg(rotationY)).c_str());
             break;
         }
         catch (...) { break; }
@@ -302,7 +296,6 @@ void KASOKU::updateValue(int btnIndex)
             float newRotZ = std::stof(text);
             rotationZ = Maths::degToBams(newRotZ);
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(Maths::bamsToDeg(rotationZ)).c_str());
             break;
         }
         catch (...) { break; }
@@ -315,7 +308,6 @@ void KASOKU::updateValue(int btnIndex)
             float newVar1 = std::stof(text);
             power = newVar1;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(power).c_str());
             break;
         }
         catch (...) { break; }
@@ -328,7 +320,6 @@ void KASOKU::updateValue(int btnIndex)
             int newVar2 = std::stoi(text);
             cooldown = newVar2;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(cooldown).c_str());
             break;
         }
         catch (...) { break; }
@@ -341,7 +332,6 @@ void KASOKU::updateValue(int btnIndex)
             float newVar3 = std::stof(text);
             var3 = newVar3;
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
             break;
         }
         catch (...) { break; }
@@ -355,53 +345,9 @@ void KASOKU::updateValue(int btnIndex)
 
 void KASOKU::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[ 8], "Power");
-    SetWindowTextA(Global::windowLabels[ 9], "Cooldown");
-    SetWindowTextA(Global::windowLabels[10], "Unused");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "KASOKU");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string(Maths::bamsToDeg(rotationX)).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(Maths::bamsToDeg(rotationY)).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(Maths::bamsToDeg(rotationZ)).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(power).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(cooldown).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(var3).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 1, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Speed pad");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "(in degrees)");
-    SetWindowTextA(Global::windowDescriptions[ 6], "(in degrees)");
-    SetWindowTextA(Global::windowDescriptions[ 7], "(in degrees)");
-    SetWindowTextA(Global::windowDescriptions[ 8], "Speed that the player goes. If <= 0, 14 is used instead.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Time (in frames) of cooldown after each use. The player's control stick is also locked during this time. If <= 0, 60 is used instead.");
-    SetWindowTextA(Global::windowDescriptions[10], "");
 
     #ifdef SAB_GUIDES
     Vector3f vel(1, 0, 0);
@@ -430,7 +376,6 @@ void KASOKU::updateEditorWindows()
         timeLeft -= dt;
     }
     std::string endSpeed = std::to_string(vel.length());
-    SetWindowTextA(Global::windowDescriptions[10], endSpeed.c_str());
     #endif
 
     refreshMatrixAndCol();

@@ -171,11 +171,11 @@ void SWITCH::loadStaticModels()
     std::fprintf(stdout, "Loading SWITCH static models...\n");
     #endif
 
-    loadModel(&SWITCH::models, "res/Models/GlobalObjects/Switch/", "Switch");
+    loadModel(&SWITCH::models, Global::dirProgRoot + "res/Models/GlobalObjects/Switch/", "Switch");
 
     if (SWITCH::cmBase == nullptr)
     {
-        SWITCH::cmBase = loadCollisionModel("res/Models/GlobalObjects/Switch/", "Switch");
+        SWITCH::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Switch/", "Switch");
     }
 }
 
@@ -192,7 +192,6 @@ void SWITCH::deleteStaticModels()
 void SWITCH::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -249,7 +248,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -264,7 +262,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -279,7 +276,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -294,7 +290,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(rotationX).c_str());
             break;
         }
         catch (...) { break; }
@@ -309,7 +304,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -324,7 +318,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(rotationZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -339,7 +332,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(newVar1).c_str());
             break;
         }
         catch (...) { break; }
@@ -355,7 +347,6 @@ void SWITCH::updateValue(int btnIndex)
             updateCollisionModelYXZ();
             updateID();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(newVar2).c_str());
             break;
         }
         catch (...) { break; }
@@ -370,7 +361,6 @@ void SWITCH::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(newVar3).c_str());
             break;
         }
         catch (...) { break; }
@@ -407,53 +397,9 @@ void SWITCH::unhighlight() {
 
 void SWITCH::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[0], "ID");
-    SetWindowTextA(Global::windowLabels[1], "Name");
-    SetWindowTextA(Global::windowLabels[2], "Position X");
-    SetWindowTextA(Global::windowLabels[3], "Position Y");
-    SetWindowTextA(Global::windowLabels[4], "Position Z");
-    SetWindowTextA(Global::windowLabels[5], "Rotation X");
-    SetWindowTextA(Global::windowLabels[6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[7], "Rotation Z");
-    SetWindowTextA(Global::windowLabels[8], "Switch Type");
-    SetWindowTextA(Global::windowLabels[9], "Trigger ID");
-    SetWindowTextA(Global::windowLabels[10], "Frames To Be Active");
 
-    SetWindowTextA(Global::windowValues[0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[1], "SWITCH");
-    SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[5], std::to_string(rotationX).c_str());
-    SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[7], std::to_string(rotationZ).c_str());
-    SetWindowTextA(Global::windowValues[8], std::to_string(type).c_str());
-    SetWindowTextA(Global::windowValues[9], std::to_string(triggerID).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(activeFrames).c_str());
 
-    SendMessageA(Global::windowValues[0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[0], "");
-    SetWindowTextA(Global::windowDescriptions[1], "Switch");
-    SetWindowTextA(Global::windowDescriptions[2], "");
-    SetWindowTextA(Global::windowDescriptions[3], "");
-    SetWindowTextA(Global::windowDescriptions[4], "");
-    SetWindowTextA(Global::windowDescriptions[5], "");
-    SetWindowTextA(Global::windowDescriptions[6], "");
-    SetWindowTextA(Global::windowDescriptions[7], "");
-    SetWindowTextA(Global::windowDescriptions[8], "Type of switch: 0 is mutually exclusive (to other type-0 switches), 1 is toggle, 2 is permanent, 3 is timed.");
-    SetWindowTextA(Global::windowDescriptions[9], "An ID that tells the game what switch-activated object to trigger when it is flicked.");
-    SetWindowTextA(Global::windowDescriptions[10], "On timed switches, is the time, in frames, that the switch remains active for.");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();

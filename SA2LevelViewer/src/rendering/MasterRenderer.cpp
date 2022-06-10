@@ -46,7 +46,9 @@ float MasterRenderer::BLUE  = 0.2f;
 
 void MasterRenderer::init()
 {
-    shader = new ShaderProgram("res/Shaders/entity/vertexShader.txt", "res/Shaders/entity/fragmentShader.txt"); INCR_NEW("ShaderProgram");
+    std::string vertexShader = Global::dirProgRoot + "res/Shaders/entity/vertexShader.txt";
+    std::string fragmentShader = Global::dirProgRoot + "res/Shaders/entity/fragmentShader.txt";
+    shader = new ShaderProgram(vertexShader.c_str(), fragmentShader.c_str()); INCR_NEW("ShaderProgram");
     projectionMatrix = new Matrix4f; INCR_NEW("Matrix4f");
     renderer = new EntityRenderer(shader, projectionMatrix); INCR_NEW("EntityRenderer");
 
@@ -189,7 +191,7 @@ void MasterRenderer::prepare()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(RED, GREEN, BLUE, 1);
 
-    if (Global::renderWithCulling)
+    if (Global::menuManager->renderWithCulling)
     {
         MasterRenderer::enableCulling();
     }
@@ -207,7 +209,7 @@ void MasterRenderer::prepareTransparentRender()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    if (Global::renderWithCulling)
+    if (Global::menuManager->renderWithCulling)
     {
         MasterRenderer::enableCulling();
     }
@@ -227,7 +229,7 @@ void MasterRenderer::prepareTransparentRenderDepthOnly()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(true);
 
-    if (Global::renderWithCulling)
+    if (Global::menuManager->renderWithCulling)
     {
         MasterRenderer::enableCulling();
     }

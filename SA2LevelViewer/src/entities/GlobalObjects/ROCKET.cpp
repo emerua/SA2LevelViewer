@@ -177,11 +177,11 @@ void ROCKET::loadStaticModels()
     std::fprintf(stdout, "Loading ROCKET static models...\n");
     #endif
 
-    loadModel(&ROCKET::models, "res/Models/GlobalObjects/Rocket/", "Rocket");
+    loadModel(&ROCKET::models, Global::dirProgRoot + "res/Models/GlobalObjects/Rocket/", "Rocket");
 
     if (ROCKET::cmBase == nullptr)
     {
-        ROCKET::cmBase = loadCollisionModel("res/Models/GlobalObjects/Rocket/", "Rocket");
+        ROCKET::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Rocket/", "Rocket");
     }
 }
 
@@ -198,7 +198,6 @@ void ROCKET::deleteStaticModels()
 void ROCKET::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -252,7 +251,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newX = std::stof(text);
             position.x = newX;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -264,7 +262,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newY = std::stof(text);
             position.y = newY;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -276,7 +273,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newZ = std::stof(text);
             position.z = newZ;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -288,7 +284,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             int newNeedsSwitch = std::stoi(text);
             needsSwitch = (bool)newNeedsSwitch;
-            SetWindowTextA(Global::windowValues[5], std::to_string((int)needsSwitch).c_str());
             break;
         }
         catch (...) { break; }
@@ -300,7 +295,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             int newRotY = std::stoi(text);
             rotationY = newRotY;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -312,7 +306,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             int newSwitchID = std::stoi(text);
             switchID = newSwitchID;
-            SetWindowTextA(Global::windowValues[7], std::to_string(switchID).c_str());
             break;
         }
         catch (...) { break; }
@@ -324,7 +317,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newEndX = std::stof(text);
             endX = newEndX;
-            SetWindowTextA(Global::windowValues[8], std::to_string(endX).c_str());
             break;
         }
         catch (...) { break; }
@@ -336,7 +328,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newEndY = std::stof(text);
             endY = newEndY;
-            SetWindowTextA(Global::windowValues[9], std::to_string(endY).c_str());
             break;
         }
         catch (...) { break; }
@@ -348,7 +339,6 @@ void ROCKET::updateValue(int btnIndex)
         {
             float newEndZ = std::stof(text);
             endZ = newEndZ;
-            SetWindowTextA(Global::windowValues[10], std::to_string(endZ).c_str());
             break;
         }
         catch (...) { break; }
@@ -367,53 +357,9 @@ void ROCKET::updateValue(int btnIndex)
 
 void ROCKET::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[ 0], "ID"        );
-    SetWindowTextA(Global::windowLabels[ 1], "Name"      );
-    SetWindowTextA(Global::windowLabels[ 2], "Position X");
-    SetWindowTextA(Global::windowLabels[ 3], "Position Y");
-    SetWindowTextA(Global::windowLabels[ 4], "Position Z");
-    SetWindowTextA(Global::windowLabels[ 5], "Switch Activated");
-    SetWindowTextA(Global::windowLabels[ 6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[ 7], "Switch ID");
-    SetWindowTextA(Global::windowLabels[ 8], "End X");
-    SetWindowTextA(Global::windowLabels[ 9], "End Y");
-    SetWindowTextA(Global::windowLabels[10], "End Z");
 
-    SetWindowTextA(Global::windowValues[ 0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[ 1], "ROCKET");
-    SetWindowTextA(Global::windowValues[ 2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[ 3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[ 4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[ 5], std::to_string((int)needsSwitch).c_str());
-    SetWindowTextA(Global::windowValues[ 6], std::to_string(ogRotY).c_str());
-    SetWindowTextA(Global::windowValues[ 7], std::to_string(switchID).c_str());
-    SetWindowTextA(Global::windowValues[ 8], std::to_string(endX).c_str());
-    SetWindowTextA(Global::windowValues[ 9], std::to_string(endY).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(endZ).c_str());
 
-    SendMessageA(Global::windowValues[ 0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 6], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[ 7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[ 9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[ 0], "");
-    SetWindowTextA(Global::windowDescriptions[ 1], "Rocket that transports the player.");
-    SetWindowTextA(Global::windowDescriptions[ 2], "");
-    SetWindowTextA(Global::windowDescriptions[ 3], "");
-    SetWindowTextA(Global::windowDescriptions[ 4], "");
-    SetWindowTextA(Global::windowDescriptions[ 5], "Set to 1 to make the rocket require a switch to turn on.");
-    SetWindowTextA(Global::windowDescriptions[ 6], "Doesn't actually affect rotation, because rotation is automatically calculated to point to the drop-off.");
-    SetWindowTextA(Global::windowDescriptions[ 7], "An ID that tells the game which switch needs to be turned on to activate this rocket.");
-    SetWindowTextA(Global::windowDescriptions[ 8], "X position of drop-off.");
-    SetWindowTextA(Global::windowDescriptions[ 9], "Y position of drop-off.");
-    SetWindowTextA(Global::windowDescriptions[10], "Z position of drop-off.");
 
     calculateRotY();
     updateTransformationMatrixYXZ();

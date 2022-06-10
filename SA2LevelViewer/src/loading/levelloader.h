@@ -49,6 +49,8 @@ public:
 
     static void promptUserForLevelSAB();
 
+    static void autoLoadLevel();
+
     static int getNumLevels();
 
     static std::string getObjectName(int levelID, int objectID);

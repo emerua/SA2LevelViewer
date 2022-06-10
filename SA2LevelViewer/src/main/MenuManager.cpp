@@ -1,0 +1,93 @@
+#include "MenuManager.h"
+
+MenuManager::MenuManager(GLFWwindow* window) {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 400");
+}
+
+void MenuManager::InitRender() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
+bool MenuManager::CreateViewWindow() {
+    bool shouldLoadNewLevel = false;
+
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_::ImGuiCond_Once);
+    ImGui::Begin("Options", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+
+    ImGui::Text("File Options");
+    ImGui::Indent(16.0f);
+    ImGui::Text("Load level objects");
+    ImGui::SameLine();
+    shouldLoadNewLevel = ImGui::Button("Open");
+    ImGui::Unindent(16.0f);
+
+    ImGui::Separator();
+
+    ImGui::Text("View Options");
+    ImGui::Indent(16.0f);
+    ImGui::Checkbox("View Stage", &displayStage);
+    ImGui::Checkbox("View Collision", &displayStageCollision);
+    ImGui::Checkbox("View Killplanes", &displayStageKillplanes);
+    ImGui::Checkbox("View Background", &displayStageSky);
+    ImGui::Checkbox("View Camera Triggers", &displayCameraTriggers);
+    ImGui::Checkbox("View Loopspeed Triggers", &displayLoopspeedTriggers);
+    ImGui::Checkbox("Backface Culling", &renderWithCulling);
+    ImGui::Unindent(16.0f);
+
+    ImGui::Separator();
+
+    ImGui::Text("Sa2 Options");
+    ImGui::Indent(16.0f);
+    ImGui::Checkbox("Load level objects automatically", &autoLoadObjects);
+    ImGui::Checkbox("Follow SA2 in RealTime", &isFollowRealTime);
+    ImGui::Indent(16.0f);
+    ImGui::BeginDisabled(!isFollowRealTime);
+    ImGui::Checkbox("No Follow Camera", &gameIsFollowingSA2NoCam);
+    ImGui::EndDisabled();
+
+    ImGui::End();
+
+    return shouldLoadNewLevel;
+}
+
+void MenuManager::CreateHelpWindow(std::string version) {
+    ImGui::SetNextWindowCollapsed(true, ImGuiCond_::ImGuiCond_Once);
+    ImGui::Begin("Help", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
+
+    ImGui::Text((("Version " + version) + "\n\n"
+        "Load the U and S setfile in and the rest of the stage models will load automatically.\n"
+        "Controls:\n"
+        "    Mouse scroll to move camera forward/backward\n"
+        "    Alt + Mouse scroll to move camera towards/away from the 3D Cursor\n"
+        "    Mouse middle click + mouse move to rotate camera\n"
+        "    Mouse middle click + mouse move + Shift to pan camera\n"
+        "    Mouse middle click + mouse move + Alt to rotate camera around 3D Cursor\n"
+        "    Mouse middle click + mouse move + Shift + Alt to pan camera relative to 3D Cursor\n").c_str());
+
+    ImGui::SetWindowSize("Help", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Once);
+    ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+    ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+    ImGuiStyle style = ImGui::GetStyle();
+    float contentWidth = vMax.x - vMin.x + style.WindowPadding.x * 2;
+    ImGui::SetWindowPos("Help", ImVec2(ImGui::GetIO().DisplaySize.x - contentWidth - 10, 10), ImGuiCond_::ImGuiCond_Once);
+    ImGui::End();
+}
+
+void MenuManager::Render() {
+    // Rendering
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}

@@ -171,11 +171,11 @@ void BUNCHIN::loadStaticModels()
     std::fprintf(stdout, "Loading BUNCHIN static models...\n");
     #endif
 
-    loadModel(&BUNCHIN::models, "res/Models/GlobalObjects/Bunchin/", "BunchinSmall");
+    loadModel(&BUNCHIN::models, Global::dirProgRoot + "res/Models/GlobalObjects/Bunchin/", "BunchinSmall");
 
     if (BUNCHIN::cmBase == nullptr)
     {
-        BUNCHIN::cmBase = loadCollisionModel("res/Models/GlobalObjects/Bunchin/", "BunchinSmall");
+        BUNCHIN::cmBase = loadCollisionModel(Global::dirProgRoot + "res/Models/GlobalObjects/Bunchin/", "BunchinSmall");
     }
 }
 
@@ -192,7 +192,6 @@ void BUNCHIN::deleteStaticModels()
 void BUNCHIN::updateValue(int btnIndex)
 {
     char buf[128];
-    GetWindowTextA(Global::windowValues[btnIndex], buf, 128);
     std::string text = buf;
 
     switch (btnIndex)
@@ -249,7 +248,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
             break;
         }
         catch (...) { break; }
@@ -264,7 +262,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
             break;
         }
         catch (...) { break; }
@@ -279,7 +276,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
             break;
         }
         catch (...) { break; }
@@ -294,7 +290,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[5], std::to_string(dropType).c_str());
             break;
         }
         catch (...) { break; }
@@ -309,7 +304,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
             break;
         }
         catch (...) { break; }
@@ -324,7 +318,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[7], std::to_string(switchID).c_str());
             break;
         }
         catch (...) { break; }
@@ -339,7 +332,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[8], std::to_string(newVar1).c_str());
             break;
         }
         catch (...) { break; }
@@ -354,7 +346,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[9], std::to_string(newVar2).c_str());
             break;
         }
         catch (...) { break; }
@@ -369,7 +360,6 @@ void BUNCHIN::updateValue(int btnIndex)
             updateTransformationMatrixYXZ();
             updateCollisionModelYXZ();
             Global::redrawWindow = true;
-            SetWindowTextA(Global::windowValues[10], std::to_string(newVar3).c_str());
             break;
         }
         catch (...) { break; }
@@ -383,53 +373,9 @@ void BUNCHIN::updateValue(int btnIndex)
 
 void BUNCHIN::updateEditorWindows()
 {
-    SetWindowTextA(Global::windowLabels[0], "ID");
-    SetWindowTextA(Global::windowLabels[1], "Name");
-    SetWindowTextA(Global::windowLabels[2], "Position X");
-    SetWindowTextA(Global::windowLabels[3], "Position Y");
-    SetWindowTextA(Global::windowLabels[4], "Position Z");
-    SetWindowTextA(Global::windowLabels[5], "Falling Type");
-    SetWindowTextA(Global::windowLabels[6], "Rotation Y");
-    SetWindowTextA(Global::windowLabels[7], "Switch ID");
-    SetWindowTextA(Global::windowLabels[8], "Scale X");
-    SetWindowTextA(Global::windowLabels[9], "Drop Height");
-    SetWindowTextA(Global::windowLabels[10], "Scale Z");
 
-    SetWindowTextA(Global::windowValues[0], std::to_string(ID).c_str());
-    SetWindowTextA(Global::windowValues[1], "BUNCHIN");
-    SetWindowTextA(Global::windowValues[2], std::to_string(position.x).c_str());
-    SetWindowTextA(Global::windowValues[3], std::to_string(position.y).c_str());
-    SetWindowTextA(Global::windowValues[4], std::to_string(position.z).c_str());
-    SetWindowTextA(Global::windowValues[5], std::to_string(dropType).c_str());
-    SetWindowTextA(Global::windowValues[6], std::to_string(rotationY).c_str());
-    SetWindowTextA(Global::windowValues[7], std::to_string(switchID).c_str());
-    SetWindowTextA(Global::windowValues[8], std::to_string(unitsToScale(scaleX)).c_str());
-    SetWindowTextA(Global::windowValues[9], std::to_string(weightHeight - 30.0f).c_str());
-    SetWindowTextA(Global::windowValues[10], std::to_string(unitsToScale(scaleZ)).c_str());
 
-    SendMessageA(Global::windowValues[0], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[1], EM_SETREADONLY, 1, 0);
-    SendMessageA(Global::windowValues[2], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[3], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[4], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[5], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[6], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[7], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[8], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[9], EM_SETREADONLY, 0, 0);
-    SendMessageA(Global::windowValues[10], EM_SETREADONLY, 0, 0);
 
-    SetWindowTextA(Global::windowDescriptions[0], "");
-    SetWindowTextA(Global::windowDescriptions[1], "Weight Trap");
-    SetWindowTextA(Global::windowDescriptions[2], "");
-    SetWindowTextA(Global::windowDescriptions[3], "");
-    SetWindowTextA(Global::windowDescriptions[4], "");
-    SetWindowTextA(Global::windowDescriptions[5], "Type of weight: 0 drops repeatedly, 1 drops when underneath and resets when away, 2 drops when underneath and stays down.");
-    SetWindowTextA(Global::windowDescriptions[6], "");
-    SetWindowTextA(Global::windowDescriptions[7], "Hitting a SWITCH with RotationX equal to this number will disable the weight.");
-    SetWindowTextA(Global::windowDescriptions[8], "Length is equal to 40 + 40 * value.");
-    SetWindowTextA(Global::windowDescriptions[9], "Height that the weight rises to above 30 units.");
-    SetWindowTextA(Global::windowDescriptions[10], "Length is equal to 40 + 40 * value.");
 
     updateTransformationMatrixYXZ();
     updateCollisionModelYXZ();
