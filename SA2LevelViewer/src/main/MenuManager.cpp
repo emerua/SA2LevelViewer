@@ -66,7 +66,7 @@ void MenuManager::CreateHelpWindow(std::string version) {
     ImGui::SetNextWindowCollapsed(true, ImGuiCond_::ImGuiCond_Once);
     ImGui::Begin("Help", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 
-    ImGui::Text((("Version " + version) + "\n\n"
+    ImGui::Text((("Version " + version) + "\nThis project is forked from TurtleMan64/SA2LevelEditor\n\n"
         "Load the U and S setfile in and the rest of the stage models will load automatically.\n"
         "Controls:\n"
         "    Mouse scroll to move camera forward/backward\n"
@@ -74,7 +74,31 @@ void MenuManager::CreateHelpWindow(std::string version) {
         "    Mouse middle click + mouse move to rotate camera\n"
         "    Mouse middle click + mouse move + Shift to pan camera\n"
         "    Mouse middle click + mouse move + Alt to rotate camera around 3D Cursor\n"
-        "    Mouse middle click + mouse move + Shift + Alt to pan camera relative to 3D Cursor\n").c_str());
+        "    Mouse middle click + mouse move + Shift + Alt to pan camera relative to 3D Cursor\n\n"
+        "----------\n\n"
+        R"(imgui
+
+The MIT License (MIT)
+
+Copyright (c) 2014-2022 Omar Cornut
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.)").c_str());
 
     ImGui::SetWindowSize("Help", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Once);
     ImVec2 vMin = ImGui::GetWindowContentRegionMin();
