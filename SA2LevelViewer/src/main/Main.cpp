@@ -996,6 +996,30 @@ void Global::updateCamFromSA2()
         Global::gamePlayer->setPosition(sonicX, sonicY, sonicZ);
         Global::gamePlayer->setRotation(bamsX, -bamsY, bamsZ);
         Global::gamePlayer->updateTransformationMatrixYXZ();
+
+        //make the score have a 1 at the end as a first
+        // line of defence against cheaters :)
+        char score;
+        bytesRead = 0;
+        if (!ReadProcessMemory(sa2Handle, (LPCVOID)0x0174B050, (LPVOID)(&score), (SIZE_T)1, &bytesRead) || bytesRead != 1)
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return;
+        }
+
+        score = score | 0x1;
+        SIZE_T bytesWritten = 0;
+        if (!WriteProcessMemory(sa2Handle, (LPVOID)0x0174B050, (LPCVOID)(&score), (SIZE_T)1, &bytesWritten) || bytesWritten != 1)
+        {
+            CloseHandle(sa2Handle);
+            sa2Handle = NULL;
+            sa2PID = NULL;
+            timeUntilNextProcessAttach = ATTACH_DELAY;
+            return;
+        }
     }
     else if (Global::sa2Type == Global::SA2Type::Dolphin)
     {
