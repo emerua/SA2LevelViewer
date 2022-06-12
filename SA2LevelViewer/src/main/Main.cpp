@@ -87,7 +87,7 @@
 #include "../imgui/imgui_impl_opengl3.h"
 #include "MenuManager.h"
 
-std::string Global::version = "1.0.0_alpha";
+std::string Global::version = "1.0.0-alpha";
 
 std::unordered_set<Entity*> Global::gameEntities;
 std::list<Entity*> Global::gameEntitiesToAdd;
