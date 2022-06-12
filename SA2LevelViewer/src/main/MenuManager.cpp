@@ -115,3 +115,10 @@ void MenuManager::Render() {
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+MenuManager::~MenuManager()
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}

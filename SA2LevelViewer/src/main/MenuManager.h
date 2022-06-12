@@ -19,6 +19,8 @@ public:
 
 	void Render();
 
+	~MenuManager();
+
 	bool gameIsFollowingSA2 = false;
 	bool gameIsFollowingSA2NoCam = false;
 	bool autoLoadObjects = false;
