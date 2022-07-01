@@ -1,0 +1,57 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ "SA2LevelViewer" ]
+  pull_request:
+    branches: [ "SA2LevelViewer" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+  
+  ARCH: x64
+  
+  OUTPUT_PATH: ./out
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=${{env.ARCH}} ${{env.SOLUTION_FILE_PATH}} 
+
+    - name: Copy artifact
+      run: |
+        mkdir ${{env.OUTPUT_PATH}}
+        cp          ${{env.SOLUTION_FILE_PATH}}/${{env.ARCH}}/${{env.BUILD_CONFIGURATION}}/* ${{env.OUTPUT_PATH}}
+        cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/res                           ${{env.OUTPUT_PATH}}
+        cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/Settings                      ${{env.OUTPUT_PATH}}
+        cp          ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/imgui.ini                     ${{env.OUTPUT_PATH}}
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: SA2LevelViewer
+        path: ${{env.OUTPUT_PATH}}
