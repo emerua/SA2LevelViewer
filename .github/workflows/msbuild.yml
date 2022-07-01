@@ -44,11 +44,11 @@ jobs:
 
     - name: Copy artifact
       run: |
-        mkdir -p ${{env.OUTPUT_PATH}}
-        cp ${{env.SOLUTION_FILE_PATH}}/${{env.ARCH}}/${{env.BUILD_CONFIGURATION}}/* ${{env.OUTPUT_PATH}}
-        cp ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/res                           ${{env.OUTPUT_PATH}}
-        cp ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/Settings                      ${{env.OUTPUT_PATH}}
-        cp ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/imgui.ini                     ${{env.OUTPUT_PATH}}
+        mkdir ${{env.OUTPUT_PATH}}
+        cp          ${{env.SOLUTION_FILE_PATH}}/${{env.ARCH}}/${{env.BUILD_CONFIGURATION}}/* ${{env.OUTPUT_PATH}}
+        cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/res                           ${{env.OUTPUT_PATH}}
+        cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/Settings                      ${{env.OUTPUT_PATH}}
+        cp          ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/imgui.ini                     ${{env.OUTPUT_PATH}}
       
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
