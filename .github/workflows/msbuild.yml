@@ -17,7 +17,7 @@ env:
   
   ARCH: x64
   
-  OUTPUT_PATH: ${{env.SOLUTION_FILE_PATH}}/out
+  OUTPUT_PATH: ./out
 
 permissions:
   contents: read
