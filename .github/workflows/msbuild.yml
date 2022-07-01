@@ -2,6 +2,7 @@ name: MSBuild
 
 on:
   push:
+    tags: '*'
     branches: [ "SA2LevelViewer" ]
   pull_request:
     branches: [ "SA2LevelViewer" ]
