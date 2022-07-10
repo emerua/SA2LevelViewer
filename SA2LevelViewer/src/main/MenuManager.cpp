@@ -1,9 +1,8 @@
 #include "MenuManager.h"
 
-MenuManager::MenuManager(GLFWwindow* window) {
+MenuManager::MenuManager(GLFWwindow* window) : context(ImGui::CreateContext()), io(ImGui::GetIO()) {
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    (void)io;
 
 
     // Setup Dear ImGui style
@@ -37,6 +36,7 @@ bool MenuManager::CreateViewWindow() {
 
     ImGui::Text("View Options");
     ImGui::Indent(16.0f);
+    ImGui::Checkbox("Lock Camera", &lockCamera);
     ImGui::Checkbox("View Stage", &displayStage);
     ImGui::Checkbox("View Collision", &displayStageCollision);
     ImGui::Checkbox("View Killplanes", &displayStageKillplanes);
@@ -57,6 +57,7 @@ bool MenuManager::CreateViewWindow() {
     ImGui::Checkbox("No Follow Camera", &gameIsFollowingSA2NoCam);
     ImGui::EndDisabled();
 
+    ImGui::SetWindowSize("Options", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Once);
     ImGui::End();
 
     return shouldLoadNewLevel;
@@ -70,11 +71,9 @@ void MenuManager::CreateHelpWindow(std::string version) {
         "Load the U and S setfile in and the rest of the stage models will load automatically.\n"
         "Controls:\n"
         "    Mouse scroll to move camera forward/backward\n"
-        "    Alt + Mouse scroll to move camera towards/away from the 3D Cursor\n"
-        "    Mouse middle click + mouse move to rotate camera\n"
-        "    Mouse middle click + mouse move + Shift to pan camera\n"
-        "    Mouse middle click + mouse move + Alt to rotate camera around 3D Cursor\n"
-        "    Mouse middle click + mouse move + Shift + Alt to pan camera relative to 3D Cursor\n\n"
+        "    Mouse left click + mouse move to rotate camera\n"
+        "    Mouse left click + WASDQE to move camera\n"
+        "    * All controls are available while \"Lock Camera\" setting be unchecking only.\n\n"
         "----------\n\n"
         R"(imgui
 
@@ -116,9 +115,14 @@ void MenuManager::Render() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+bool MenuManager::isMouseCaptured()
+{
+    return io.WantCaptureMouse;
+}
+
 MenuManager::~MenuManager()
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    ImGui::DestroyContext(context);
 }

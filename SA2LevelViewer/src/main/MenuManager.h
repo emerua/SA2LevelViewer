@@ -19,11 +19,17 @@ public:
 
 	void Render();
 
+	bool isMouseCaptured();
+
 	~MenuManager();
+
+	ImGuiContext* context;
+	ImGuiIO& io;
 
 	bool gameIsFollowingSA2 = false;
 	bool gameIsFollowingSA2NoCam = false;
 	bool autoLoadObjects = false;
+	bool lockCamera = true;
 	bool displayCameraTriggers = false;
 	bool displayLoopspeedTriggers = false;
 	bool displayStage = true;

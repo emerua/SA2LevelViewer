@@ -203,188 +203,53 @@ void DisplayManager::callbackCursorPosition(GLFWwindow* window, double xpos, dou
     DisplayManager::prevXPos = xpos;
     DisplayManager::prevYPos = ypos;
 
-    int stateMouse = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
-    if (stateMouse == GLFW_PRESS) //rotate the camera if you hold middle click
-    {
-        if (Global::isHoldingShift && Global::isHoldingAlt) //pan based on distance from 3d cursor
-        {
-            Vector3f distFromCursor = Global::gameCursor3D->position - Global::gameCamera->eye;
-            float PAN_SPEED = 0.005f*distFromCursor.length();
-
-            Vector3f camRight = Global::gameCamera->calcRight();
-            Vector3f camUp = Global::gameCamera->calcUp();
-            camRight.normalize();
-            camUp.normalize();
-
-            Vector3f offset = camUp.scaleCopy(-yDiff*PAN_SPEED) + camRight.scaleCopy(-xDiff*PAN_SPEED);
-            Global::gameCamera->eye = Global::gameCamera->eye + offset;
-        }
-        else if (Global::isHoldingShift)  //pan the camera if you hold middle click and shift
-        {
-            const float PAN_SPEED = 0.5f;
-
-            Vector3f camRight = Global::gameCamera->calcRight();
-            Vector3f camUp = Global::gameCamera->calcUp();
-            camRight.normalize();
-            camUp.normalize();
-
-            Vector3f offset = camUp.scaleCopy(-yDiff*PAN_SPEED) + camRight.scaleCopy(-xDiff*PAN_SPEED);
-            Global::gameCamera->eye = Global::gameCamera->eye + offset;
-        }
-        else if (Global::isHoldingAlt)  //rotate the camera around the 3d cursor
-        {
-            const float ROTATE_SPEED = 0.2f;
-            float rotateAmountRadiansYaw   = Maths::toRadians(xDiff*ROTATE_SPEED);
-            float rotateAmountRadiansPitch = Maths::toRadians(yDiff*ROTATE_SPEED);
-
-            float pitchBefore = Maths::toRadians(Global::gameCamera->pitch);
-            float pitchAfter = pitchBefore + rotateAmountRadiansPitch;
-            pitchAfter = fmaxf(pitchAfter, Maths::toRadians(-89.99f));
-            pitchAfter = fminf(pitchAfter, Maths::toRadians( 89.99f));
-            rotateAmountRadiansPitch = pitchAfter-pitchBefore;
-
-            Global::gameCamera->yaw   += Maths::toDegrees(rotateAmountRadiansYaw);
-            Global::gameCamera->pitch += Maths::toDegrees(rotateAmountRadiansPitch);
-
-            Vector3f diff = Global::gameCamera->eye - Global::gameCursor3D->position;
-
-            Vector3f yAxis(0, -1, 0); //rotate horizontally
-            diff = Maths::rotatePoint(&diff, &yAxis, rotateAmountRadiansYaw);
-
-            Vector3f perpen = yAxis.cross(&diff); //rotate vertically
-            diff = Maths::rotatePoint(&diff, &perpen, rotateAmountRadiansPitch);
-
-            Global::gameCamera->eye = Global::gameCursor3D->position + diff;
-        }
-        else  //rotate the camera if you hold middle click
-        {
-            const float ROTATE_SPEED = 0.2f;
-            Global::gameCamera->yaw += xDiff*ROTATE_SPEED;
-
-            float pitchBefore = Global::gameCamera->pitch;
-            float pitchAfter = pitchBefore+yDiff*ROTATE_SPEED;
-
-            pitchAfter = fmaxf(pitchAfter, -89.99f);
-            pitchAfter = fminf(pitchAfter,  89.99f);
-
-            Global::gameCamera->pitch = pitchAfter;
-        }
-
-        Global::redrawWindow = true;
+    if (!Global::CameraRotateMode) {
+        return;
     }
 
-    if ((Global::isHoldingX || Global::isHoldingY || Global::isHoldingZ) && Global::selectedSA2Object != nullptr)
-    {
-        //rotate objects
-        if (Global::isHoldingClickRight)
-        {
-            float ROT_SPEED = 0.07f;
+    const float ROTATE_SPEED = 0.2f;
+    Global::gameCamera->yaw += xDiff * ROTATE_SPEED;
 
-            if (Global::isHoldingShift)
-            {
-                ROT_SPEED = 3.0f;
-            }
+    float pitchBefore = Global::gameCamera->pitch;
+    float pitchAfter = pitchBefore + yDiff * ROTATE_SPEED;
 
-            if (Global::isHoldingX)
-            {
-                Global::selectedSA2Object->rotationX -= (int)std::round((yDiff)*ROT_SPEED);
-            }
-            if (Global::isHoldingY)
-            {
-                Global::selectedSA2Object->rotationY -= (int)std::round((xDiff)*ROT_SPEED);
-            }
-            if (Global::isHoldingZ)
-            {
-                Global::selectedSA2Object->rotationZ -= (int)std::round((xDiff)*ROT_SPEED);
-            }
-        }
-        else //move objects
-        {
-            float SLIDE_SPEED = 0.005f;
+    pitchAfter = fmaxf(pitchAfter, -89.99f);
+    pitchAfter = fminf(pitchAfter, 89.99f);
 
-            if (Global::isHoldingShift)
-            {
-                SLIDE_SPEED = 0.5f;
-            }
+    Global::gameCamera->pitch = pitchAfter;
 
-            if (Global::isHoldingX)
-            {
-                Global::selectedSA2Object->position.x += (xDiff)*SLIDE_SPEED;
-            }
-            if (Global::isHoldingY)
-            {
-                Global::selectedSA2Object->position.y -= (yDiff)*SLIDE_SPEED;
-            }
-            if (Global::isHoldingZ)
-            {
-                Global::selectedSA2Object->position.z += (yDiff)*SLIDE_SPEED;
-            }
-        }
-
-        Global::selectedSA2Object->updateEditorWindows();
-        Global::redrawWindow = true;
-    }
+    Global::redrawWindow = true;
 }
 
 void DisplayManager::callbackMouseScroll(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
 {
-    if (Global::isHoldingAlt)
+    if (Global::menuManager->lockCamera)
     {
-        //move the camera forward or back based on distance from 3d cursor
-        Vector3f camDiff = Global::gameCursor3D->position - Global::gameCamera->eye;
-        camDiff.scale(0.1f*(float)yoffset);
-        if (camDiff.length() > 0.16f || yoffset < 0)
-        {
-            Global::gameCamera->eye = Global::gameCamera->eye + camDiff;
-        }
-    }
-    else
-    {
-        //move the camera forward or back at constant rate
-        const float MOVE_SPEED = 40.0f;
-        Vector3f camDir = Global::gameCamera->calcForward();
-        camDir.normalize();
-        Vector3f moveOffset = camDir.scaleCopy(((float)yoffset)*MOVE_SPEED);
-        Global::gameCamera->eye = Global::gameCamera->eye + moveOffset;
+        return;
     }
 
+    //move the camera forward or back at constant rate
+    const float MOVE_SPEED = 40.0f;
+    Vector3f camDir = Global::gameCamera->calcForward();
+    camDir.normalize();
+    Vector3f moveOffset = camDir.scaleCopy(((float)yoffset)*MOVE_SPEED);
+    Global::gameCamera->eye = Global::gameCamera->eye + moveOffset;
     Global::redrawWindow = true;
 }
 
 void DisplayManager::callbackMouseClick(GLFWwindow* window, int button, int action, int /*mods*/)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-
-        Vector3f clickDir = Maths::calcWorldSpaceDirectionVectorFromScreenSpaceCoords((float)xpos, (float)ypos);
-        clickDir.setLength(100);
-
-        Vector3f checkEnd(&Global::gameCamera->eye);
-        checkEnd = checkEnd + clickDir.scaleCopy(10000);
-        if (CollisionChecker::checkCollision(&Global::gameCamera->eye, &checkEnd))
+        if (action == GLFW_PRESS && !Global::menuManager->lockCamera && !Global::menuManager->isMouseCaptured())
         {
-            Global::gameCursor3D->setPosition(CollisionChecker::getCollidePosition());
+            Global::CameraRotateMode = true;
+            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-        else
+        else if(action == GLFW_RELEASE && Global::CameraRotateMode)
         {
-            Vector3f ringpos = Global::gameCamera->eye + clickDir;
-            Global::gameCursor3D->setPosition(&ringpos);
-        }
-
-        Global::redrawWindow = true;
-    }
-
-    if (button == GLFW_MOUSE_BUTTON_RIGHT)
-    {
-        if (action == GLFW_PRESS)
-        {
-            Global::isHoldingClickRight = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            Global::isHoldingClickRight = false;
+            Global::CameraRotateMode = false;
+            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
 }
@@ -400,123 +265,22 @@ void DisplayManager::callbackKeyboard(GLFWwindow* /*window*/, int key, int /*sca
             }
             break;
 
-        case GLFW_KEY_E:
-            if (action == GLFW_PRESS)
-            {
-                Global::shouldExportLevel = true;
-            }
-            break;
-
-        case GLFW_KEY_X:
-            if (action == GLFW_PRESS)
-            {
-                Global::isHoldingX = true;
-                glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                Global::isHoldingX = false;
-                if (!Global::isHoldingY && !Global::isHoldingZ)
-                {
-                    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                }
-            }
-            break;
-
-        case GLFW_KEY_Y:
-            if (action == GLFW_PRESS)
-            {
-                Global::isHoldingY = true;
-                glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                Global::isHoldingY = false;
-                if (!Global::isHoldingX && !Global::isHoldingZ)
-                {
-                    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                }
-            }
-            break;
-
-        case GLFW_KEY_Z:
-            if (action == GLFW_PRESS)
-            {
-                Global::isHoldingZ = true;
-                glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                Global::isHoldingZ = false;
-                if (!Global::isHoldingX && !Global::isHoldingY)
-                {
-                    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                }
-            }
-            break;
-
-        case GLFW_KEY_LEFT_SHIFT:
-        case GLFW_KEY_RIGHT_SHIFT:
-            if (action == GLFW_PRESS)
-            {
-                Global::isHoldingShift = true;
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                Global::isHoldingShift = false;
-            }
-            break;
-
-        case GLFW_KEY_LEFT_ALT:
-        case GLFW_KEY_RIGHT_ALT:
-            if (action == GLFW_PRESS)
-            {
-                Global::isHoldingAlt = true;
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                Global::isHoldingAlt = false;
-            }
-            break;
-
-        case GLFW_KEY_DELETE:
-            if (action == GLFW_PRESS)
-            {
-                if (Global::selectedSA2Object != nullptr)
-                {
-                    Global::deleteEntity(Global::selectedSA2Object);
-
-                    if (Global::selectedSA2Object->lvlLineNum >= 0)
-                    {
-                        LevelLoader::lvlFile[Global::selectedSA2Object->lvlLineNum] = "";
-                    }
-
-                    Global::selectedSA2Object->cleanUp();
-                    Global::selectedSA2Object = nullptr;
-                    Global::redrawWindow = true;
-                }
-            }
-            break;
-
+        case GLFW_KEY_W:
+        case GLFW_KEY_S:
         case GLFW_KEY_D:
-            if (action == GLFW_PRESS && (mods & 0x0002))
+        case GLFW_KEY_A:
+        case GLFW_KEY_E:
+        case GLFW_KEY_Q:
+        case GLFW_KEY_LEFT_SHIFT:
+            if (action == GLFW_PRESS)
             {
-                if (Global::selectedSA2Object != nullptr)
-                {
-                    char data[32] = {0};
-                    Global::selectedSA2Object->fillData(&data[0]);
-
-                    SA2Object* newObject = LevelLoader::newSA2Object(Global::levelID, Global::selectedSA2Object->ID, &data[0], false);
-                    if (newObject != nullptr)
-                    {
-                        newObject->position.y += 10;
-                        Global::addEntity(newObject);
-                        Global::selectedSA2Object = newObject;
-                        Global::selectedSA2Object->updateEditorWindows();
-                        Global::redrawWindow = true;
-                    }
-                }
+                Global::isHoldingKeys.insert(key);
             }
+            else if(action == GLFW_RELEASE)
+            {
+                Global::isHoldingKeys.erase(key);
+            }
+
             break;
 
         case GLFW_KEY_KP_7:

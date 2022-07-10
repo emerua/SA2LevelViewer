@@ -87,7 +87,7 @@
 #include "../imgui/imgui_impl_opengl3.h"
 #include "MenuManager.h"
 
-std::string Global::version = "1.0.0-alpha";
+std::string Global::version = "1.0.0";
 
 std::unordered_set<Entity*> Global::gameEntities;
 std::list<Entity*> Global::gameEntitiesToAdd;
@@ -112,19 +112,14 @@ double timeNew = 0;
 bool Global::redrawWindow = true;
 SA2Object* Global::selectedSA2Object = nullptr;
 
-bool Global::isHoldingX          = false;
-bool Global::isHoldingY          = false;
-bool Global::isHoldingZ          = false;
-bool Global::isHoldingAlt        = false;
-bool Global::isHoldingShift      = false;
-bool Global::isHoldingClickRight = false;
+std::unordered_set<int> Global::isHoldingKeys;
+bool Global::CameraRotateMode = false;
 
 Camera*          Global::gameCamera          = nullptr;
 Stage*           Global::gameStage           = nullptr;
 StageCollision*  Global::gameStageCollision  = nullptr;
 StageKillplanes* Global::gameStageKillplanes = nullptr;
 StageSky*        Global::gameStageSky        = nullptr;
-Cursor3D*        Global::gameCursor3D        = nullptr;
 Dummy*           Global::gamePlayer          = nullptr;
 
 std::list<TexturedModel*> playerModels;
@@ -202,10 +197,6 @@ int Global::main()
 
     GuiManager::init();
     GuiTextureResources::loadGuiTextures();
-
-    //This cursor never gets deleted
-    Cursor3D cursor;
-    Global::gameCursor3D = &cursor;
 
     CollisionChecker::initChecker();
 
@@ -339,6 +330,55 @@ int Global::main()
             //    continue;
             //}
         }
+        
+        if (!Global::menuManager->gameIsFollowingSA2 && Global::CameraRotateMode)
+        {
+            float moveSpeedDolly = 0.0f;
+            float moveSpeedTrackUp = 0.0f;
+            float moveSpeedTrackRight = 0.0f;
+
+            float moveSpeed = 0.5f;
+            if (Global::isHoldingKeys.find(GLFW_KEY_LEFT_SHIFT) != Global::isHoldingKeys.end())
+            {
+                moveSpeed = 2.0f;
+            }
+
+            for (auto it = Global::isHoldingKeys.cbegin(); it != Global::isHoldingKeys.cend(); it++)
+            {
+                if (*it == GLFW_KEY_W)
+                {
+                    moveSpeedDolly += moveSpeed;
+                }
+                else if (*it == GLFW_KEY_S)
+                {
+                    moveSpeedDolly -= moveSpeed;
+                }
+                else if (*it == GLFW_KEY_D)
+                {
+                    moveSpeedTrackRight += moveSpeed;
+                }
+                else if (*it == GLFW_KEY_A)
+                {
+                    moveSpeedTrackRight -= moveSpeed;
+                }
+                else if (*it == GLFW_KEY_E)
+                {
+                    moveSpeedTrackUp += moveSpeed;
+                }
+                else if (*it == GLFW_KEY_Q)
+                {
+                    moveSpeedTrackUp -= moveSpeed;
+                }
+            }
+
+            Vector3f camDolly = Global::gameCamera->calcForward();
+            Vector3f dollyOffset = camDolly.scaleCopy(moveSpeedDolly);
+            Vector3f camTrackRight = Global::gameCamera->calcRight();
+            Vector3f trackRightOffset = camTrackRight.scaleCopy(moveSpeedTrackRight);
+            Vector3f camTrackUp = Global::gameCamera->calcUp();
+            Vector3f trackUpOffset = camTrackUp.scaleCopy(moveSpeedTrackUp);
+            Global::gameCamera->eye = Global::gameCamera->eye + dollyOffset + trackRightOffset + trackUpOffset;
+        }
 
         //long double thisTime = std::time(0);
         //std::fprintf(stdout, "time: %f time\n", thisTime);
@@ -425,7 +465,6 @@ int Global::main()
                     e->step();
                 }
 
-                Global::gameCursor3D->step();
                 Global::gameStage->step();
                 Global::gameStageCollision->step();
                 Global::gameStageKillplanes->step();
@@ -992,7 +1031,6 @@ void Global::updateCamFromSA2()
             return;
         }
 
-        Global::gameCursor3D->setPosition(sonicX, sonicY, sonicZ);
         Global::gamePlayer->setPosition(sonicX, sonicY, sonicZ);
         Global::gamePlayer->setRotation(bamsX, -bamsY, bamsZ);
         Global::gamePlayer->updateTransformationMatrixYXZ();
@@ -1156,7 +1194,6 @@ void Global::updateCamFromSA2()
             ptr[1] = buffer[30];
             ptr[0] = buffer[31];
 
-            Global::gameCursor3D->setPosition(posX, posY, posZ);
             Global::gamePlayer->setPosition(posX, posY, posZ);
             Global::gamePlayer->setRotation(bamsX, -bamsY, bamsZ);
             Global::gamePlayer->updateTransformationMatrixYXZ();
@@ -1320,7 +1357,6 @@ void Global::updateCamFromSA2()
             return;
         }
 
-        Global::gameCursor3D->setPosition(playerPosX, playerPosY, playerPosZ);
         Global::gamePlayer->setPosition(playerPosX, playerPosY, playerPosZ);
         Global::gamePlayer->setRotation(playerRotX, -playerRotY, playerRotZ);
         Global::gamePlayer->updateTransformationMatrixYXZ();
@@ -1362,70 +1398,70 @@ void Global::updateCamFromSA2()
 
 void Global::teleportSA2PlayerToCursor3D()
 {
-    DWORD pid = getPIDByName("sonic2app.exe");
+    //DWORD pid = getPIDByName("sonic2app.exe");
 
-    if (pid == NULL)
-    {
-        return;
-    }
+    //if (pid == NULL)
+    //{
+    //    return;
+    //}
 
-    HANDLE handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_OPERATION | PROCESS_VM_WRITE, false, pid);
-    if (handle == NULL)
-    {
-        return;
-    }
+    //HANDLE handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_OPERATION | PROCESS_VM_WRITE, false, pid);
+    //if (handle == NULL)
+    //{
+    //    return;
+    //}
 
-    SIZE_T bytesRead = 0;
-    unsigned long long masterobjptr = 0;
-    if (!ReadProcessMemory(handle, (LPCVOID)0x01DEA6E0, (LPVOID)(&masterobjptr), (SIZE_T)4, &bytesRead) || bytesRead != 4)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //SIZE_T bytesRead = 0;
+    //unsigned long long masterobjptr = 0;
+    //if (!ReadProcessMemory(handle, (LPCVOID)0x01DEA6E0, (LPVOID)(&masterobjptr), (SIZE_T)4, &bytesRead) || bytesRead != 4)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    if (masterobjptr <= 0x400000)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //if (masterobjptr <= 0x400000)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    bytesRead = 0;
-    unsigned long long chobj1ptr = 0;
-    if (!ReadProcessMemory(handle, (LPCVOID)(masterobjptr+0x34), (LPVOID)(&chobj1ptr), (SIZE_T)4, &bytesRead) || bytesRead != 4)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //bytesRead = 0;
+    //unsigned long long chobj1ptr = 0;
+    //if (!ReadProcessMemory(handle, (LPCVOID)(masterobjptr+0x34), (LPVOID)(&chobj1ptr), (SIZE_T)4, &bytesRead) || bytesRead != 4)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    if (chobj1ptr <= 0x400000)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //if (chobj1ptr <= 0x400000)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    SIZE_T bytesWritten = 0;
-    float sonicX = Global::gameCursor3D->position.x;
-    if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x14), (LPCVOID)(&sonicX), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //SIZE_T bytesWritten = 0;
+    //float sonicX = Global::gameCursor3D->position.x;
+    //if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x14), (LPCVOID)(&sonicX), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    bytesWritten = 0;
-    float sonicY = Global::gameCursor3D->position.y+5;
-    if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x18), (LPCVOID)(&sonicY), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //bytesWritten = 0;
+    //float sonicY = Global::gameCursor3D->position.y+5;
+    //if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x18), (LPCVOID)(&sonicY), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    bytesWritten = 0;
-    float sonicZ = Global::gameCursor3D->position.z;
-    if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x1C), (LPCVOID)(&sonicZ), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
-    {
-        CloseHandle(handle);
-        return;
-    }
+    //bytesWritten = 0;
+    //float sonicZ = Global::gameCursor3D->position.z;
+    //if (!WriteProcessMemory(handle, (LPVOID)(chobj1ptr+0x1C), (LPCVOID)(&sonicZ), (SIZE_T)4, &bytesWritten) || bytesWritten != 4)
+    //{
+    //    CloseHandle(handle);
+    //    return;
+    //}
 
-    CloseHandle(handle);
+    //CloseHandle(handle);
 }

@@ -69,19 +69,14 @@ public:
     static SA2Object* selectedSA2Object;
 
     //inputs
-    static bool isHoldingX;
-    static bool isHoldingY;
-    static bool isHoldingZ;
-    static bool isHoldingAlt;
-    static bool isHoldingShift;
-    static bool isHoldingClickRight;
+    static std::unordered_set<int> isHoldingKeys;
+    static bool CameraRotateMode;
 
     static Camera* gameCamera;
     static Stage* gameStage;
     static StageCollision* gameStageCollision;
     static StageKillplanes* gameStageKillplanes;
     static StageSky* gameStageSky;
-    static Cursor3D* gameCursor3D;
     static Dummy* gamePlayer;
     static int countNew;
     static int countDelete;
