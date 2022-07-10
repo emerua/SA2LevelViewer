@@ -86,6 +86,7 @@
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
 #include "MenuManager.h"
+#include <functional>
 
 std::string Global::version = "1.0.0";
 
@@ -333,50 +334,39 @@ int Global::main()
         
         if (!Global::menuManager->gameIsFollowingSA2 && Global::CameraRotateMode)
         {
-            float moveSpeedDolly = 0.0f;
-            float moveSpeedTrackUp = 0.0f;
-            float moveSpeedTrackRight = 0.0f;
-
             float moveSpeed = 0.5f;
             if (Global::isHoldingKeys.find(GLFW_KEY_LEFT_SHIFT) != Global::isHoldingKeys.end())
             {
                 moveSpeed = 2.0f;
             }
 
+            const std::unordered_map<int, std::function<void(Vector3f&)>> MOVE_FUNCS =
+            {
+                { GLFW_KEY_W, [moveSpeed](Vector3f& a) { a.x += moveSpeed; } },
+                { GLFW_KEY_S, [moveSpeed](Vector3f& a) { a.x -= moveSpeed; } },
+                { GLFW_KEY_D, [moveSpeed](Vector3f& a) { a.z += moveSpeed; } },
+                { GLFW_KEY_A, [moveSpeed](Vector3f& a) { a.z -= moveSpeed; } },
+                { GLFW_KEY_E, [moveSpeed](Vector3f& a) { a.y -= moveSpeed; } },
+                { GLFW_KEY_Q, [moveSpeed](Vector3f& a) { a.y += moveSpeed; } }
+            };
+
+            Vector3f moveSpeeds;
             for (auto it = Global::isHoldingKeys.cbegin(); it != Global::isHoldingKeys.cend(); it++)
             {
-                if (*it == GLFW_KEY_W)
-                {
-                    moveSpeedDolly += moveSpeed;
-                }
-                else if (*it == GLFW_KEY_S)
-                {
-                    moveSpeedDolly -= moveSpeed;
-                }
-                else if (*it == GLFW_KEY_D)
-                {
-                    moveSpeedTrackRight += moveSpeed;
-                }
-                else if (*it == GLFW_KEY_A)
-                {
-                    moveSpeedTrackRight -= moveSpeed;
-                }
-                else if (*it == GLFW_KEY_E)
-                {
-                    moveSpeedTrackUp += moveSpeed;
-                }
-                else if (*it == GLFW_KEY_Q)
-                {
-                    moveSpeedTrackUp -= moveSpeed;
+                auto it2 = MOVE_FUNCS.find(*it);
+                if (it2 != MOVE_FUNCS.end()) {
+                    it2->second(moveSpeeds);
                 }
             }
 
             Vector3f camDolly = Global::gameCamera->calcForward();
-            Vector3f dollyOffset = camDolly.scaleCopy(moveSpeedDolly);
-            Vector3f camTrackRight = Global::gameCamera->calcRight();
-            Vector3f trackRightOffset = camTrackRight.scaleCopy(moveSpeedTrackRight);
             Vector3f camTrackUp = Global::gameCamera->calcUp();
-            Vector3f trackUpOffset = camTrackUp.scaleCopy(moveSpeedTrackUp);
+            Vector3f camTrackRight = camTrackUp.cross(&camDolly);
+
+            Vector3f dollyOffset = camDolly.scaleCopy(moveSpeeds.getX());
+            Vector3f trackRightOffset = camTrackRight.scaleCopy(moveSpeeds.getZ());
+            Vector3f trackUpOffset = camTrackUp.scaleCopy(moveSpeeds.getY());
+
             Global::gameCamera->eye = Global::gameCamera->eye + dollyOffset + trackRightOffset + trackUpOffset;
         }
 
@@ -545,7 +535,14 @@ int Global::main()
 
         if (timeNew - previousTime >= 1.0)
         {
-            //std::fprintf(stdout, "fps: %f\n", frameCount / (timeNew - previousTime));
+            //char const* const format = "fps: %f\n";
+            //int len = _scprintf(format, frameCount / (timeNew - previousTime)) + 1;
+            //std::string buffer(len, '\0');
+            //if (buffer.size() != 0)
+            //{
+            //    sprintf_s(&buffer[0], buffer.size(), format, frameCount / (timeNew - previousTime));
+            //}
+            //OutputDebugString(buffer.c_str());
             //std::fprintf(stdout, "diff: %d\n", Global::countNew - Global::countDelete);
             //Loader::printInfo();
             //std::fprintf(stdout, "entity counts: %d %d %d\n", gameEntities.size(), gameEntitiesPass2.size(), gameTransparentEntities.size());
