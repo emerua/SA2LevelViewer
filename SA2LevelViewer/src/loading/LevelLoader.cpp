@@ -1212,6 +1212,11 @@ void LevelLoader::autoLoadLevel()
     }
 
     char currentLevel = Global::getCurrentLevel();
+    if (Global::levelID == currentLevel)
+    {
+        Global::isLoadedLevel = true;
+        return;
+    }
 
     std::string folder = Global::dirSA2Root + "\\resource\\gd_PC\\";
 
