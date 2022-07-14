@@ -155,6 +155,8 @@ int DisplayManager::createDisplay()
 
     //Master_makeProjectionMatrix();
 
+    glfwSetWindowSizeLimits(glfwWindow, ((int)SCR_WIDTH) / 2, ((int)SCR_HEIGHT) / 2, GLFW_DONT_CARE, GLFW_DONT_CARE);
+
     return 0;
 }
 
@@ -223,7 +225,7 @@ void DisplayManager::callbackCursorPosition(GLFWwindow* window, double xpos, dou
 
 void DisplayManager::callbackMouseScroll(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
 {
-    if (Global::menuManager->lockCamera)
+    if (Global::menuManager->lockCamera || Global::menuManager->openLicenseWindow)
     {
         return;
     }

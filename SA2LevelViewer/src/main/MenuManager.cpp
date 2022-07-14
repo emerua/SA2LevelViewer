@@ -1,4 +1,8 @@
 #include "MenuManager.h"
+#include "..\resource\resource.h"
+#include <Windows.h>
+#include <fstream>
+#include <sstream>
 
 MenuManager::MenuManager(GLFWwindow* window) : context(ImGui::CreateContext()), io(ImGui::GetIO()) {
     IMGUI_CHECKVERSION();
@@ -75,30 +79,9 @@ void MenuManager::CreateHelpWindow(std::string version) {
         "    Mouse left click + WASDQE to move camera\n"
         "    * All controls are available while \"Lock Camera\" setting be unchecking only.\n\n"
         "----------\n\n"
-        R"(imgui
+        ).c_str());
 
-The MIT License (MIT)
-
-Copyright (c) 2014-2022 Omar Cornut
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.)").c_str());
-
+    openLicenseWindow = ImGui::Button("License") || openLicenseWindow;
     ImGui::SetWindowSize("Help", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Once);
     ImVec2 vMin = ImGui::GetWindowContentRegionMin();
     ImVec2 vMax = ImGui::GetWindowContentRegionMax();
@@ -106,6 +89,49 @@ SOFTWARE.)").c_str());
     float contentWidth = vMax.x - vMin.x + style.WindowPadding.x * 2;
     ImGui::SetWindowPos("Help", ImVec2(ImGui::GetIO().DisplaySize.x - contentWidth - 10, 10), ImGuiCond_::ImGuiCond_Once);
     ImGui::End();
+
+    if (openLicenseWindow) {
+        CreateLicenseWindow();
+    }
+}
+
+void MenuManager::CreateLicenseWindow()
+{
+    HRSRC resInfo = FindResource(NULL, MAKEINTRESOURCE(LICENSE_INFO), "TXT");
+    if (resInfo == NULL)
+    {
+        OutputDebugString("resInfo is NULL");
+        return;
+    }
+
+    HGLOBAL handle = LoadResource(NULL, resInfo);
+    if (handle == NULL)
+    {
+        OutputDebugString("handle is NULL");
+        return;
+    }
+
+    DWORD datasize = SizeofResource(NULL, resInfo);
+    LPVOID data = LockResource(handle);
+
+    if (datasize == 0 || data == NULL)
+    {
+        OutputDebugString("data is NULL");
+        return;
+    }
+
+    std::stringstream ss{ std::string((char*)data, datasize) };
+    std::string licenseInfoStr = ss.str();
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    ImGui::OpenPopup("License");
+    if (ImGui::BeginPopupModal("License", &openLicenseWindow, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize + ImGuiWindowFlags_::ImGuiWindowFlags_NoMove + ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse + ImGuiWindowFlags_::ImGuiWindowFlags_HorizontalScrollbar))
+    {
+        ImGui::TextUnformatted(licenseInfoStr.c_str());
+        float width = fmaxf(io.DisplaySize.x * 0.8f, 512.0f);
+        float height = fmaxf(io.DisplaySize.y * 0.8, 288.0f);
+        ImGui::SetWindowSize("License", ImVec2(width, height), ImGuiCond_::ImGuiCond_Always);
+        ImGui::EndPopup();
+    }
 }
 
 void MenuManager::Render() {

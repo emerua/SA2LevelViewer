@@ -8,3 +8,4 @@ SA2LevelViewer/x64
 SA2LevelViewer/Release
 SA2LevelViewer/Debug
 makebuild
+*.aps

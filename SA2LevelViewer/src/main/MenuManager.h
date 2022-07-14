@@ -17,6 +17,8 @@ public:
 
 	void CreateHelpWindow(std::string);
 
+	void CreateLicenseWindow();
+
 	void Render();
 
 	bool isMouseCaptured();
@@ -38,4 +40,7 @@ public:
 	bool displayStageSky = false;
 	bool renderWithCulling = false;
 	bool isFollowRealTime = false;
+
+	bool openLicenseWindow = false;
+
 };

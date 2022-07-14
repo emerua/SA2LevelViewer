@@ -48,6 +48,9 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{098de558-85b9-44f1-bcb5-d33810ea8de8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\resource">
+      <UniqueIdentifier>{931bb407-10d2-446d-a6b0-f5e621d30324}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c">
@@ -607,5 +610,16 @@
     <ClInclude Include="src\main\MenuManager.h">
       <Filter>Source Files\main</Filter>
     </ClInclude>
+    <ClInclude Include="src\resource\resource.h">
+      <Filter>Source Files\resource</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE_INFO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\resource\SA2LevelViewer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
