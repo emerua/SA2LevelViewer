@@ -3,7 +3,9 @@
 #include <GLFW/glfw3.h>
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-#include <string>
+#include "../toolbox/vector.h"
+#include <unordered_map>
+#include <tuple>
 
 class MenuManager
 {
@@ -13,15 +15,21 @@ public:
 
 	void InitRender();
 
-	bool CreateViewWindow();
+	void CreateViewWindow();
 
-	void CreateHelpWindow(std::string);
+	void CreateCameraWindow();
+
+	void CreateHelpWindow();
 
 	void CreateLicenseWindow();
 
 	void Render();
 
 	bool isMouseCaptured();
+
+	bool saveCameraLocation(int);
+
+	bool loadCameraLocation(int);
 
 	~MenuManager();
 
@@ -43,4 +51,10 @@ public:
 
 	bool openLicenseWindow = false;
 
+	bool confirmSave = true;
+	bool confirmLoad = true;
+
+	std::unordered_map<int, std::tuple<Vector3f, float, float>> camLocations;
+private:
+	ImVec2 adjustWindow(const char* const);
 };

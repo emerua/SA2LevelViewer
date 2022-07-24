@@ -198,7 +198,7 @@ void DisplayManager::framebuffer_size_callback(GLFWwindow* /*windowHandle*/, int
 
 double DisplayManager::prevXPos = 0;
 double DisplayManager::prevYPos = 0;
-void DisplayManager::callbackCursorPosition(GLFWwindow* window, double xpos, double ypos)
+void DisplayManager::callbackCursorPosition(GLFWwindow* /*window*/, double xpos, double ypos)
 {
     float xDiff = (float)(xpos - prevXPos);
     float yDiff = (float)(ypos - prevYPos);
@@ -246,12 +246,12 @@ void DisplayManager::callbackMouseClick(GLFWwindow* window, int button, int acti
         if (action == GLFW_PRESS && !Global::menuManager->lockCamera && !Global::menuManager->isMouseCaptured())
         {
             Global::CameraRotateMode = true;
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
         else if(action == GLFW_RELEASE && Global::CameraRotateMode)
         {
             Global::CameraRotateMode = false;
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
 }
@@ -283,6 +283,29 @@ void DisplayManager::callbackKeyboard(GLFWwindow* /*window*/, int key, int /*sca
                 Global::isHoldingKeys.erase(key);
             }
 
+            break;
+
+        case GLFW_KEY_F1:
+        case GLFW_KEY_F2:
+        case GLFW_KEY_F3:
+        case GLFW_KEY_F4:
+        case GLFW_KEY_F5:
+            if (action != GLFW_PRESS)
+            {
+                break;
+            }
+
+            {
+                int locNo = key - GLFW_KEY_F1 + 1;
+                if (mods && GLFW_MOD_SHIFT)
+                {
+                    Global::menuManager->saveCameraLocation(locNo);
+                }
+                else
+                {
+                    Global::menuManager->loadCameraLocation(locNo);
+                }
+            }
             break;
 
         case GLFW_KEY_KP_7:

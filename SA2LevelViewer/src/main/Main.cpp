@@ -7,12 +7,10 @@
 #include <tchar.h>
 #include <tlhelp32.h>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <functional>
 
 #include <string>
 #include <cstring>
@@ -29,6 +27,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "main.h"
 #include "displaymanager.h"
@@ -86,7 +87,6 @@
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
 #include "MenuManager.h"
-#include <functional>
 
 std::string Global::version = "1.0.0";
 
@@ -147,7 +147,7 @@ std::unordered_map<std::string, std::string> Global::levelSetToLVL2;
 bool isFollowRealTime = false;
 
 //entry point of the program
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int /*nCmdShow*/)
+int WINAPI WinMain(_In_ HINSTANCE /*hInstance*/, _In_opt_ HINSTANCE /*hPrevInstance*/, _In_ LPSTR /*lpCmdLine*/, _In_ int /*nCmdShow*/)
 {
     //remake the console, since it somehow becomes missing once we enter the program here
     #ifdef DEV_MODE
@@ -521,8 +521,9 @@ int Global::main()
         }
 
         Global::menuManager->InitRender();
-        Global::shouldLoadNewLevel = Global::menuManager->CreateViewWindow();
-        Global::menuManager->CreateHelpWindow(Global::version);
+        Global::menuManager->CreateViewWindow();
+        Global::menuManager->CreateCameraWindow();
+        Global::menuManager->CreateHelpWindow();
         Global::menuManager->Render();
 
         Global::menuManager->gameIsFollowingSA2 = Global::menuManager->isFollowRealTime && !Global::menuManager->gameIsFollowingSA2NoCam;
