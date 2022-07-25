@@ -45,6 +45,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 LICENSE_INFO               TXT                    "..\..\LICENSE_INFO.txt"
+DEFAULT_SETTINGS           JSON                   "..\..\DEFAULT_SETTINGS.json"
 
 #endif    // “ú–{Œê (“ú–{) resources
 /////////////////////////////////////////////////////////////////////////////

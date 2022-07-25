@@ -3,6 +3,7 @@
 // SA2LevelViewer.rc ‚ÅŽg—p
 //
 #define LICENSE_INFO                101
+#define DEFAULT_SETTINGS            102
 
 // Next default values for new objects
 // 

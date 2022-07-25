@@ -160,7 +160,6 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
 
     CollisionChecker::deleteAllCollideModels();
 
-    Global::gameCamera->reset();
     Global::selectedSA2Object = nullptr;
 
 
@@ -179,6 +178,15 @@ void LevelLoader::loadLevel(std::string setDir, std::string setS, std::string se
     getlineSafe(file, levelnum);
     int level = std::stoi(levelnum);
     Global::levelID = level;
+
+    if (Global::menuManager->defaultSlots[level] == 0)
+    {
+        Global::gameCamera->reset();
+    }
+    else
+    {
+        Global::menuManager->loadCameraLocation();
+    }
 
     //setfile names
     std::string setSname;

@@ -29,7 +29,9 @@ public:
 
 	bool saveCameraLocation(int);
 
-	bool loadCameraLocation(int);
+	bool loadCameraLocation();
+	bool loadCameraLocation(int slotID);
+	bool loadCameraLocation(int slotID, bool isDefault);
 
 	~MenuManager();
 
@@ -58,7 +60,12 @@ public:
 	bool confirmSave = true;
 	bool confirmLoad = true;
 
-	std::unordered_map<int, std::tuple<Vector3f, float, float>> camLocations;
+	std::unordered_map<int, std::unordered_map<int, std::tuple<Vector3f, float, float>>> camLocations;
+	std::unordered_map<int, int> defaultSlots;
+
 private:
 	ImVec2 adjustWindow(const char* const);
+
+	void loadSettings();
+	void saveSettings();
 };

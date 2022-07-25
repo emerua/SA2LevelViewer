@@ -2,10 +2,16 @@
 #include <fstream>
 #include <sstream>
 #include <format>
+
+#include <json/json.hpp>
+
 #include "MenuManager.h"
-#include "..\resource\resource.h"
+#include "../resource/resource.h"
 #include "../main/main.h"
 #include "../entities/camera.h"
+#include "../toolbox/vector.h"
+
+using json = nlohmann::json;
 
 MenuManager::MenuManager(GLFWwindow* window) : context(ImGui::CreateContext()), io(ImGui::GetIO()) {
     IMGUI_CHECKVERSION();
@@ -18,6 +24,8 @@ MenuManager::MenuManager(GLFWwindow* window) : context(ImGui::CreateContext()), 
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 400");
+
+    loadSettings();
 }
 
 void MenuManager::InitRender() {
@@ -28,15 +36,18 @@ void MenuManager::InitRender() {
 
 void MenuManager::CreateViewWindow() {
     ImGui::Begin("Options", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
-
+    
+    ImGui::SetNextItemOpen(collapsedFileOption);
     collapsedFileOption = ImGui::TreeNodeEx("File Options");
     if (collapsedFileOption)
     {
         ImGui::PushItemWidth(16.0f);
         // ImGui::Indent(16.0f);
+        ImGui::BeginDisabled(autoLoadObjects);
         ImGui::Text("Load level objects");
         ImGui::SameLine();
         Global::shouldLoadNewLevel = ImGui::Button("Open");
+        ImGui::EndDisabled();
         // ImGui::Unindent(16.0f);
         ImGui::PopItemWidth();
         ImGui::TreePop();
@@ -44,6 +55,7 @@ void MenuManager::CreateViewWindow() {
 
     ImGui::Separator();
 
+    ImGui::SetNextItemOpen(collapsedViewOption);
     collapsedViewOption = ImGui::TreeNodeEx("View Options");
     if (collapsedViewOption)
     {
@@ -62,6 +74,7 @@ void MenuManager::CreateViewWindow() {
 
     ImGui::Separator();
 
+    ImGui::SetNextItemOpen(collapsedSA2Option);
     collapsedSA2Option = ImGui::TreeNodeEx("Sa2 Options");
     if (collapsedSA2Option)
     {
@@ -91,6 +104,9 @@ void MenuManager::CreateCameraWindow() {
     ImGui::Separator();
     ImGui::Text("LevelID: [%d]", Global::levelID);
 
+    bool checkboxes[6] = { 0 };
+    checkboxes[defaultSlots[Global::levelID]] = true;
+
     if (ImGui::BeginTable("table1", 4, ImGuiTableFlags_Borders))
     {
         ImGui::TableSetupColumn("No.", ImGuiTableColumnFlags_::ImGuiTableColumnFlags_WidthFixed, 200.0F);
@@ -102,12 +118,17 @@ void MenuManager::CreateCameraWindow() {
         {
             ImGui::TableNextRow();
 
+            ImGui::BeginDisabled(Global::levelID == 0);
             ImGui::TableSetColumnIndex(0);
             std::string slotText = "Not Set";
-            if (Global::levelID != 0 && camLocations.find(row) != camLocations.end())
+            if (Global::levelID != 0 && camLocations.find(Global::levelID) != camLocations.end())
             {
-                auto [eye, pitch, yaw] = camLocations.at(row);
-                slotText = std::format("({:.0f}, {:.0f}, {:.0f})", eye.x, eye.y, eye.z);
+                auto level = camLocations.at(Global::levelID);
+                if (level.find(row) != level.end())
+                {
+                    auto [eye, pitch, yaw] = level.at(row);
+                    slotText = std::format("({:.0f}, {:.0f}, {:.0f})", eye.x, eye.y, eye.z);
+                }
             }
             ImGui::Text("[%d] %s", row, slotText.c_str());
 
@@ -116,7 +137,9 @@ void MenuManager::CreateCameraWindow() {
             {
                 saveCameraLocation(row);
             }
+            ImGui::EndDisabled();
 
+            ImGui::BeginDisabled(slotText == "Not Set");
             ImGui::TableSetColumnIndex(2);
             if (ImGui::Button(std::format("Load##{}", row).c_str()))
             {
@@ -125,7 +148,19 @@ void MenuManager::CreateCameraWindow() {
 
             ImGui::TableSetColumnIndex(3);
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 25.0F - ImGui::GetFrameHeight() / 2);
-            ImGui::Checkbox(std::format("##CheckBox{}", row).c_str(), &lockCamera);
+
+            bool beforeState = checkboxes[row];
+            ImGui::Checkbox(std::format("##CheckBox{}", row).c_str(), &checkboxes[row]);
+            if (!beforeState && checkboxes[row])
+            {
+                defaultSlots[Global::levelID] = row;
+            }
+            else if (beforeState && !checkboxes[row])
+            {
+                defaultSlots[Global::levelID] = 0;
+            }
+
+            ImGui::EndDisabled();
         }
         ImGui::EndTable();
     }
@@ -232,19 +267,35 @@ bool MenuManager::saveCameraLocation(int slotID)
             return false;
         }
     }
-    camLocations[slotID] = { Global::gameCamera->eye, Global::gameCamera->pitch, Global::gameCamera->yaw };
+    camLocations[Global::levelID][slotID] = { Global::gameCamera->eye, Global::gameCamera->pitch, Global::gameCamera->yaw };
 
     return true;
 }
 
+bool MenuManager::loadCameraLocation()
+{
+    return loadCameraLocation(defaultSlots[Global::levelID], true);
+}
+
 bool MenuManager::loadCameraLocation(int slotID)
 {
-    if (Global::levelID == 0 || camLocations.find(slotID) == camLocations.end())
+    return loadCameraLocation(slotID, false);
+}
+
+bool MenuManager::loadCameraLocation(int slotID, bool isDefault)
+{
+    if (Global::levelID == 0 || camLocations.find(Global::levelID) == camLocations.end())
     {
         return false;
     }
 
-    if (confirmLoad)
+    auto level = camLocations.at(Global::levelID);
+    if (level.find(slotID) == level.end())
+    {
+        return false;
+    }
+
+    if (!isDefault && confirmLoad)
     {
         int response = MessageBox(NULL,
             std::format("Load Camera Location #{}?", slotID).c_str(),
@@ -256,7 +307,7 @@ bool MenuManager::loadCameraLocation(int slotID)
         }
     }
 
-    auto [eye, pitch, yaw] = camLocations.at(slotID);
+    auto [eye, pitch, yaw] = level.at(slotID);
     Global::gameCamera->eye = eye;
     Global::gameCamera->pitch = pitch;
     Global::gameCamera->yaw = yaw;
@@ -269,6 +320,8 @@ MenuManager::~MenuManager()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext(context);
+
+    saveSettings();
 }
 
 ImVec2 MenuManager::adjustWindow(const char* const name)
@@ -279,4 +332,164 @@ ImVec2 MenuManager::adjustWindow(const char* const name)
     ImVec2 newPos = ImVec2(x, y);
     ImGui::SetWindowPos(name, newPos, ImGuiCond_::ImGuiCond_Always);
     return newPos;
+}
+
+void MenuManager::loadSettings()
+{
+    HRSRC resInfo = FindResource(NULL, MAKEINTRESOURCE(DEFAULT_SETTINGS), "JSON");
+    if (resInfo == NULL)
+    {
+        OutputDebugString("resInfo is NULL");
+        return;
+    }
+
+    HGLOBAL handle = LoadResource(NULL, resInfo);
+    if (handle == NULL)
+    {
+        OutputDebugString("handle is NULL");
+        return;
+    }
+
+    DWORD datasize = SizeofResource(NULL, resInfo);
+    LPVOID data = LockResource(handle);
+
+    if (datasize == 0 || data == NULL)
+    {
+        OutputDebugString("data is NULL");
+        return;
+    }
+
+    std::stringstream ss{ std::string((char*)data, datasize) };
+    std::string settingsJsonStr = ss.str();
+
+    json settings = json::parse(settingsJsonStr);
+    try
+    {
+        std::ifstream f("Settings/MenuSettings.json");
+
+        if (f.is_open())
+        {
+            json j = json::parse(f);
+            settings.merge_patch(j);
+        }
+        f.close();
+
+        collapsedFileOption = settings.at("/options/file/collapsed"_json_pointer).get_to(collapsedFileOption);
+
+        settings.at("/options/view/collapsed"_json_pointer).get_to(collapsedViewOption);
+        settings.at("/options/view/lockCamera"_json_pointer).get_to(lockCamera);
+        settings.at("/options/view/displayStage"_json_pointer).get_to(displayStage);
+        settings.at("/options/view/displayStageCollision"_json_pointer).get_to(displayStageCollision);
+        settings.at("/options/view/displayStageKillplanes"_json_pointer).get_to(displayStageKillplanes);
+        settings.at("/options/view/displayStageSky"_json_pointer).get_to(displayStageSky);
+        settings.at("/options/view/displayCameraTriggers"_json_pointer).get_to(displayCameraTriggers);
+        settings.at("/options/view/displayLoopspeedTriggers"_json_pointer).get_to(displayLoopspeedTriggers);
+        settings.at("/options/view/renderWithCulling"_json_pointer).get_to(renderWithCulling);
+
+        settings.at("/options/sa2/collapsed"_json_pointer).get_to(collapsedSA2Option);
+        settings.at("/options/sa2/autoLoadObjects"_json_pointer).get_to(autoLoadObjects);
+        settings.at("/options/sa2/isFollowRealTime"_json_pointer).get_to(isFollowRealTime);
+        settings.at("/options/sa2/gameIsFollowingSA2NoCam"_json_pointer).get_to(gameIsFollowingSA2NoCam);
+
+        settings.at("/options/cameraLocation/confirmSave"_json_pointer).get_to(confirmSave);
+        settings.at("/options/cameraLocation/confirmLoad"_json_pointer).get_to(confirmLoad);
+
+        for (auto& level : settings.at("/cameraLocations"_json_pointer))
+        {
+            int levelID = level.at("/levelID"_json_pointer).get<unsigned int>();
+            int defaultSlot = level.value("/default"_json_pointer, 0);
+
+            for (auto& loc : level.at("/locations"_json_pointer))
+            {
+                int slotID = loc.at("/slotID"_json_pointer).get<unsigned int>();
+                if (slotID < 1 || slotID > 5)
+                {
+                    continue;
+                }
+
+                Vector3f eye;
+                float pitch;
+                float yaw;
+                loc.at("/eye/x"_json_pointer).get_to(eye.x);
+                loc.at("/eye/y"_json_pointer).get_to(eye.y);
+                loc.at("/eye/z"_json_pointer).get_to(eye.z);
+                loc.at("/pitch"_json_pointer).get_to(pitch);
+                loc.at("/yaw"_json_pointer).get_to(yaw);
+
+                camLocations[levelID][slotID] = { eye, pitch, yaw };
+                if (slotID == defaultSlot)
+                {
+                    defaultSlots[levelID] = slotID;
+                }
+            }
+        }
+    }
+    catch (json::exception&)
+    {
+
+    }
+}
+
+void MenuManager::saveSettings()
+{
+    std::ofstream f("Settings/MenuSettings.json");
+
+    if (!f.is_open())
+    {
+        f.close();
+        return;
+    }
+
+    json settings;
+    try
+    {
+
+        settings["/options/file/collapsed"_json_pointer] = collapsedFileOption;
+
+        settings["/options/view/collapsed"_json_pointer] = collapsedViewOption;
+        settings["/options/view/lockCamera"_json_pointer] = lockCamera;
+        settings["/options/view/displayStage"_json_pointer] = displayStage;
+        settings["/options/view/displayStageCollision"_json_pointer] = displayStageCollision;
+        settings["/options/view/displayStageKillplanes"_json_pointer] = displayStageKillplanes;
+        settings["/options/view/displayStageSky"_json_pointer] = displayStageSky;
+        settings["/options/view/displayCameraTriggers"_json_pointer] = displayCameraTriggers;
+        settings["/options/view/displayLoopspeedTriggers"_json_pointer] = displayLoopspeedTriggers;
+        settings["/options/view/renderWithCulling"_json_pointer] = renderWithCulling;
+
+        settings["/options/sa2/collapsed"_json_pointer] = collapsedSA2Option;
+        settings["/options/sa2/autoLoadObjects"_json_pointer] = autoLoadObjects;
+        settings["/options/sa2/isFollowRealTime"_json_pointer] = isFollowRealTime;
+        settings["/options/sa2/gameIsFollowingSA2NoCam"_json_pointer] = gameIsFollowingSA2NoCam;
+
+        settings["/options/cameraLocation/confirmSave"_json_pointer] = confirmSave;
+        settings["/options/cameraLocation/confirmLoad"_json_pointer] = confirmLoad;
+
+        for (auto& [levelID, level] : camLocations)
+        {
+            json levelJson;
+            levelJson["/levelID"_json_pointer] = levelID;
+            levelJson["/default"_json_pointer] = defaultSlots[levelID];
+
+            for (auto& [slotID, loc] : level)
+            {
+                json locJson;
+                auto [eye, pitch, yaw] = level.at(slotID);
+                locJson["/slotID"_json_pointer] = slotID;
+                locJson["/eye/x"_json_pointer] = eye.x;
+                locJson["/eye/y"_json_pointer] = eye.y;
+                locJson["/eye/z"_json_pointer] = eye.z;
+                locJson["/pitch"_json_pointer] = pitch;
+                locJson["/yaw"_json_pointer] = yaw;
+                levelJson["/locations"_json_pointer].push_back(locJson);
+            }
+            settings["/cameraLocations"_json_pointer].push_back(levelJson);
+        }
+    }
+    catch (json::exception&)
+    {
+
+    }
+
+    f << settings.dump(4);
+    f.close();
 }

@@ -261,7 +261,7 @@ void DisplayManager::callbackKeyboard(GLFWwindow* /*window*/, int key, int /*sca
     switch (key)
     {
         case GLFW_KEY_L:
-            if (action == GLFW_PRESS)
+            if (action == GLFW_PRESS && !Global::menuManager->autoLoadObjects)
             {
                 Global::shouldLoadNewLevel = true;
             }

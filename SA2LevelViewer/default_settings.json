@@ -1,0 +1,66 @@
+{
+    "cameraLocations": [
+        {
+            "default": 3,
+            "levelID": 22,
+            "locations": [
+                {
+                    "eye": {
+                        "x": -3778.79638671875,
+                        "y": -68.83163452148438,
+                        "z": -1467.9490966796875
+                    },
+                    "pitch": -2.194693088531494,
+                    "slotID": 1,
+                    "yaw": -90.29488372802734
+                },
+                {
+                    "eye": {
+                        "x": -4352.60595703125,
+                        "y": -56.60595703125,
+                        "z": -2009.34423828125
+                    },
+                    "pitch": 2.2053120136260986,
+                    "slotID": 2,
+                    "yaw": -236.29466247558594
+                },
+                {
+                    "eye": {
+                        "x": 31.086753845214844,
+                        "y": -5.423107624053955,
+                        "z": 240.0150146484375
+                    },
+                    "pitch": 2.205310583114624,
+                    "slotID": 3,
+                    "yaw": -377.0939025878906
+                }
+            ]
+        }
+    ],
+    "options": {
+        "cameraLocation": {
+            "confirmLoad": true,
+            "confirmSave": false
+        },
+        "file": {
+            "collapsed": true
+        },
+        "sa2": {
+            "autoLoadObjects": true,
+            "collapsed": true,
+            "gameIsFollowingSA2NoCam": true,
+            "isFollowRealTime": true
+        },
+        "view": {
+            "collapsed": true,
+            "displayCameraTriggers": false,
+            "displayLoopspeedTriggers": false,
+            "displayStage": true,
+            "displayStageCollision": true,
+            "displayStageKillplanes": true,
+            "displayStageSky": false,
+            "lockCamera": false,
+            "renderWithCulling": false
+        }
+    }
+}
