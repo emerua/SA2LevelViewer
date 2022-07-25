@@ -162,9 +162,6 @@ int WINAPI WinMain(_In_ HINSTANCE /*hInstance*/, _In_opt_ HINSTANCE /*hPrevInsta
     std::filesystem::path progRootPath(progRoot);
     Global::dirProgRoot = progRootPath.remove_filename().string();
 
-    std::filesystem::path sa2RootPath(Global::dirSA2Root + "\\resource\\gd_PC\\");
-    std::filesystem::current_path(sa2RootPath);
-
     return Global::main();
 }
 
