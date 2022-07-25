@@ -29,7 +29,8 @@ void MenuManager::InitRender() {
 void MenuManager::CreateViewWindow() {
     ImGui::Begin("Options", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 
-    if (ImGui::TreeNodeEx("File Options"))
+    collapsedFileOption = ImGui::TreeNodeEx("File Options");
+    if (collapsedFileOption)
     {
         ImGui::PushItemWidth(16.0f);
         // ImGui::Indent(16.0f);
@@ -43,7 +44,8 @@ void MenuManager::CreateViewWindow() {
 
     ImGui::Separator();
 
-    if (ImGui::TreeNodeEx("View Options"))
+    collapsedViewOption = ImGui::TreeNodeEx("View Options");
+    if (collapsedViewOption)
     {
         ImGui::PushItemWidth(16.0f);
         ImGui::Checkbox("Lock Camera", &lockCamera);
@@ -60,7 +62,8 @@ void MenuManager::CreateViewWindow() {
 
     ImGui::Separator();
 
-    if (ImGui::TreeNodeEx("Sa2 Options"))
+    collapsedSA2Option = ImGui::TreeNodeEx("Sa2 Options");
+    if (collapsedSA2Option)
     {
         ImGui::PushItemWidth(16.0f);
         ImGui::Checkbox("Load level objects automatically", &autoLoadObjects);
@@ -73,12 +76,13 @@ void MenuManager::CreateViewWindow() {
         ImGui::TreePop();
     }
     ImGui::SetWindowSize("Options", ImVec2(300.f, 0), ImGuiCond_::ImGuiCond_Always);
-    ImGui::SetWindowPos(ImVec2(10, 10), ImGuiCond_::ImGuiCond_Once);
+    ImGui::SetWindowPos(ImVec2(10, 10), ImGuiCond_::ImGuiCond_FirstUseEver);
     adjustWindow("Options");
     ImGui::End();
 }
 
 void MenuManager::CreateCameraWindow() {
+    ImGui::SetNextWindowCollapsed(true, ImGuiCond_::ImGuiCond_FirstUseEver);
     ImGui::Begin("Camera Locations", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 
     ImGui::Checkbox("Show Dialog Before Save", &confirmSave);
@@ -128,14 +132,14 @@ void MenuManager::CreateCameraWindow() {
 
     ImGui::Separator();
     ImGui::SetWindowSize("Camera Locations", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Always);
-    ImGui::SetWindowPos("Camera Locations", ImVec2(10, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowHeight() - 10), ImGuiCond_::ImGuiCond_Once);
+    ImGui::SetWindowPos("Camera Locations", ImVec2(10, ImGui::GetIO().DisplaySize.y - ImGui::GetWindowHeight() - 10), ImGuiCond_::ImGuiCond_FirstUseEver);
     adjustWindow("Camera Locations");
 
     ImGui::End();
 }
 
 void MenuManager::CreateHelpWindow() {
-    ImGui::SetNextWindowCollapsed(true, ImGuiCond_::ImGuiCond_Once);
+    ImGui::SetNextWindowCollapsed(true, ImGuiCond_::ImGuiCond_FirstUseEver);
     ImGui::Begin("Help", NULL, ImGuiWindowFlags_::ImGuiWindowFlags_NoResize);
 
     ImGui::Text((("Version " + Global::version) + "\nThis project is forked from TurtleMan64/SA2LevelEditor\n\n"
@@ -150,7 +154,7 @@ void MenuManager::CreateHelpWindow() {
 
     openLicenseWindow = ImGui::Button("License") || openLicenseWindow;
     ImGui::SetWindowSize("Help", ImVec2(0, 0), ImGuiCond_::ImGuiCond_Once);
-    ImGui::SetWindowPos("Help", ImVec2(ImGui::GetIO().DisplaySize.x - ImGui::GetWindowWidth() - 10, 10), ImGuiCond_::ImGuiCond_Once);
+    ImGui::SetWindowPos("Help", ImVec2(ImGui::GetIO().DisplaySize.x - ImGui::GetWindowWidth() - 10, 10), ImGuiCond_::ImGuiCond_FirstUseEver);
     adjustWindow("Help");
     ImGui::End();
 

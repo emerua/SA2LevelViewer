@@ -83,9 +83,6 @@
 #include "../entities/GlobalObjects/3spring.h"
 #include "../entities/GlobalObjects/ekumi.h"
 #include "../entities/GlobalObjects/eai.h"
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_impl_glfw.h"
-#include "../imgui/imgui_impl_opengl3.h"
 #include "MenuManager.h"
 
 std::string Global::version = "1.0.0";

@@ -1,8 +1,8 @@
 #pragma once
-#include "../imgui/imgui.h"
+#include <imgui/imgui.h>
 #include <GLFW/glfw3.h>
-#include "../imgui/imgui_impl_glfw.h"
-#include "../imgui/imgui_impl_opengl3.h"
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 #include "../toolbox/vector.h"
 #include <unordered_map>
 #include <tuple>
@@ -48,6 +48,10 @@ public:
 	bool displayStageSky = false;
 	bool renderWithCulling = false;
 	bool isFollowRealTime = false;
+
+	bool collapsedFileOption = false;
+	bool collapsedViewOption = false;
+	bool collapsedSA2Option = false;
 
 	bool openLicenseWindow = false;
 

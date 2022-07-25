@@ -143,7 +143,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -153,6 +153,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Libraries\Include\imgui\imgui.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\Libraries\Include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\collision\CollisionChecker.cpp" />
     <ClCompile Include="src\collision\CollisionModel.cpp" />
     <ClCompile Include="src\collision\Triangle3D.cpp" />
@@ -215,13 +222,6 @@
     <ClCompile Include="src\guis\GuiShader.cpp" />
     <ClCompile Include="src\guis\GuiTexture.cpp" />
     <ClCompile Include="src\guis\GuiTextureResources.cpp" />
-    <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\loading\FakeTexture.cpp" />
     <ClCompile Include="src\loading\LevelLoader.cpp" />
     <ClCompile Include="src\loading\Loader.cpp" />
@@ -308,15 +308,6 @@
     <ClInclude Include="src\guis\guishader.h" />
     <ClInclude Include="src\guis\guitexture.h" />
     <ClInclude Include="src\guis\guitextureresources.h" />
-    <ClInclude Include="src\imgui\imconfig.h" />
-    <ClInclude Include="src\imgui\imgui.h" />
-    <ClInclude Include="src\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="src\imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="src\imgui\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="src\imgui\imgui_internal.h" />
-    <ClInclude Include="src\imgui\imstb_rectpack.h" />
-    <ClInclude Include="src\imgui\imstb_textedit.h" />
-    <ClInclude Include="src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\loading\fakeTexture.h" />
     <ClInclude Include="src\loading\levelloader.h" />
     <ClInclude Include="src\loading\loader.h" />
