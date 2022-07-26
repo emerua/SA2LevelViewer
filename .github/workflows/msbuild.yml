@@ -52,7 +52,6 @@ jobs:
         cp          ${{env.SOLUTION_FILE_PATH}}/${{env.ARCH}}/${{env.BUILD_CONFIGURATION}}/* ${{env.OUTPUT_PATH}}
         cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/res                           ${{env.OUTPUT_PATH}}
         cp -Recurse ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/Settings                      ${{env.OUTPUT_PATH}}
-        cp          ${{env.SOLUTION_FILE_PATH}}/SA2LevelViewer/imgui.ini                     ${{env.OUTPUT_PATH}}
     
     - name: Package
       if: startsWith(github.ref, 'refs/tags/')
