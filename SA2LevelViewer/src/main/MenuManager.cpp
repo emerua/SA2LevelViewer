@@ -16,7 +16,7 @@ using json = nlohmann::json;
 MenuManager::MenuManager(GLFWwindow* window) : context(ImGui::CreateContext()), io(ImGui::GetIO()) {
     IMGUI_CHECKVERSION();
     (void)io;
-
+    io.IniFilename = "Settings/imgui.ini";
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
