@@ -183,7 +183,10 @@ void MenuManager::CreateHelpWindow() {
         "    Mouse scroll to move camera forward/backward\n"
         "    Mouse left click + mouse move to rotate camera\n"
         "    Mouse left click + WASDQE to move camera\n"
-        "    * All controls are available while \"Lock Camera\" setting be unchecking only.\n\n"
+        "    Mouse left click + + Shift + WASDQE to move camera at highspeed\n"
+        "    * These controls are available while \"Lock Camera\" setting be unchecking only.\n\n"
+        "    Shift + F1-F5 to save camera location\n"
+        "    F1-F5 to load camera location\n\n"
         "----------\n\n"
         ).c_str());
 
