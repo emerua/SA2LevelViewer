@@ -341,6 +341,9 @@
   <ItemGroup>
     <ResourceCompile Include="src\resource\SA2LevelViewer.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="default_settings.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

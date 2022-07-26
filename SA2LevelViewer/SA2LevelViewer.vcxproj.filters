@@ -595,4 +595,7 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="default_settings.json" />
+  </ItemGroup>
 </Project>
